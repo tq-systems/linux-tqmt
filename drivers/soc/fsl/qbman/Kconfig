@@ -111,6 +111,13 @@ config FSL_QMAN_TEST_STASH
 	  across a series of FQs scheduled to different portals (and cpus), with
 	  DQRR, data and context stashing always on.
 
+config FSL_QMAN_DEBUGFS
+	tristate "QMan debugfs support"
+	depends on DEBUG_FS
+	default n
+	help
+		QMan debugfs support
+
 config FSL_QMAN_INIT_TIMEOUT
 	int "timeout for qman init stage, in seconds"
 	default 10

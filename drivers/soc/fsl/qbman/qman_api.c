@@ -1834,6 +1834,37 @@ int qman_query_wq(u8 query_dedicated, struct qm_mcr_querywq *wq)
 }
 EXPORT_SYMBOL(qman_query_wq);
 
+int qman_testwrite_cgr(struct qman_cgr *cgr, u64 i_bcnt,
+			struct qm_mcr_cgrtestwrite *result)
+{
+	struct qm_mc_command *mcc;
+	struct qm_mc_result *mcr;
+	struct qman_portal *p = get_affine_portal();
+	unsigned long irqflags;
+	u8 res;
+
+	portal_irq_lock(p, &irqflags);
+	mcc = qm_mc_start(&p->p);
+	mcc->cgrtestwrite.cgid = cgr->cgrid;
+	mcc->cgrtestwrite.i_bcnt_hi = (u8)(i_bcnt >> 32);
+	mcc->cgrtestwrite.i_bcnt_lo = (u32)i_bcnt;
+	qm_mc_commit(&p->p, QM_MCC_VERB_CGRTESTWRITE);
+	while (!(mcr = qm_mc_result(&p->p)))
+		cpu_relax();
+	DPA_ASSERT((mcr->verb & QM_MCR_VERB_MASK) == QM_MCC_VERB_CGRTESTWRITE);
+	res = mcr->result;
+	if (res == QM_MCR_RESULT_OK)
+		*result = mcr->cgrtestwrite;
+	portal_irq_unlock(p, irqflags);
+	put_affine_portal();
+	if (res != QM_MCR_RESULT_OK) {
+		pr_err("CGR TEST WRITE failed: %s\n", mcr_result_str(res));
+		return -EIO;
+	}
+	return 0;
+}
+EXPORT_SYMBOL(qman_testwrite_cgr);
+
 int qman_query_cgr(struct qman_cgr *cgr, struct qm_mcr_querycgr *cgrd)
 {
 	struct qm_mc_command *mcc;
@@ -1861,6 +1892,33 @@ int qman_query_cgr(struct qman_cgr *cgr, struct qm_mcr_querycgr *cgrd)
 	return 0;
 }
 EXPORT_SYMBOL(qman_query_cgr);
+
+int qman_query_congestion(struct qm_mcr_querycongestion *congestion)
+{
+	struct qm_mc_result *mcr;
+	struct qman_portal *p = get_affine_portal();
+	unsigned long irqflags;
+	u8 res;
+
+	portal_irq_lock(p, &irqflags);
+	qm_mc_start(&p->p);
+	qm_mc_commit(&p->p, QM_MCC_VERB_QUERYCONGESTION);
+	while (!(mcr = qm_mc_result(&p->p)))
+		cpu_relax();
+	DPA_ASSERT((mcr->verb & QM_MCR_VERB_MASK) ==
+			QM_MCC_VERB_QUERYCONGESTION);
+	res = mcr->result;
+	if (res == QM_MCR_RESULT_OK)
+		*congestion = mcr->querycongestion;
+	portal_irq_unlock(p, irqflags);
+	put_affine_portal();
+	if (res != QM_MCR_RESULT_OK) {
+		pr_err("QUERY_CONGESTION failed: %s\n", mcr_result_str(res));
+		return -EIO;
+	}
+	return 0;
+}
+EXPORT_SYMBOL(qman_query_congestion);
 
 /* internal function used as a wait_event() expression */
 static int set_p_vdqcr(struct qman_portal *p, struct qman_fq *fq, u32 vdqcr)
