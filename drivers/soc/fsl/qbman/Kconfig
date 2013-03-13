@@ -71,4 +71,29 @@ config FSL_BMAN_TEST_THRESH
           "drainer" thread, and the other threads that they observe exactly
           the depletion state changes that are expected.
 
+config FSL_QMAN
+	bool "QMan device management"
+	default n
+	help
+		FSL DPAA QMan driver
+
+if FSL_QMAN
+
+config FSL_QMAN_CONFIG
+	bool "QMan device management"
+	default y
+	help
+	  If this linux image is running natively, you need this option. If this
+	  linux image is running as a guest OS under the hypervisor, only one
+	  guest OS ("the control plane") needs this option.
+
+config FSL_QMAN_INIT_TIMEOUT
+	int "timeout for qman init stage, in seconds"
+	default 10
+	help
+	The timeout setting to quit the initialization loop for non-control
+	partition in case the control partition fails to boot-up.
+
+endif # FSL_QMAN
+
 endif # FSL_DPA
