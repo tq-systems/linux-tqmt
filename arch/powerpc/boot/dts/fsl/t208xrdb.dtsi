@@ -209,3 +209,5 @@
 		};
 	};
 };
+
+/include/ "qoriq-dpaa-res3.dtsi"

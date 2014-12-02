@@ -392,3 +392,4 @@
 };
 
 /include/ "p3041si-post.dtsi"
+/include/ "qoriq-dpaa-res1.dtsi"

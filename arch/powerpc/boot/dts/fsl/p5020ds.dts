@@ -392,3 +392,4 @@
 };
 
 /include/ "p5020si-post.dtsi"
+/include/ "qoriq-dpaa-res1.dtsi"

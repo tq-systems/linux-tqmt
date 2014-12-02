@@ -338,3 +338,4 @@
 };
 
 /include/ "p2041si-post.dtsi"
+/include/ "qoriq-dpaa-res1.dtsi"

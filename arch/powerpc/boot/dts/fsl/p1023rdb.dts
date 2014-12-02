@@ -280,3 +280,4 @@
 };
 
 /include/ "p1023si-post.dtsi"
+/include/ "qoriq-dpaa-res2.dtsi"
