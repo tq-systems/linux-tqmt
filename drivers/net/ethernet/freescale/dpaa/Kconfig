@@ -1,0 +1,22 @@
+menuconfig FSL_DPAA_ETH
+	tristate "DPAA Ethernet"
+	depends on FSL_SOC && FSL_BMAN && FSL_QMAN && FSL_FMAN
+	select PHYLIB
+	select FSL_FMAN_MAC
+	---help---
+	  Data Path Acceleration Architecture Ethernet driver,
+	  supporting the Freescale QorIQ chips.
+	  Depends on Freescale Buffer Manager and Queue Manager
+	  driver and Frame Manager Driver.
+
+if FSL_DPAA_ETH
+
+config FSL_DPAA_ETH_FRIENDLY_IF_NAME
+	bool "Use fmX-macY names for the DPAA interfaces"
+	default y
+	---help---
+	  The DPAA Ethernet netdevices are created for each FMan port available
+	  on a certain board. Enable this to get interface names derived from
+	  the underlying FMan hardware for a simple identification.
+
+endif # FSL_DPAA_ETH
