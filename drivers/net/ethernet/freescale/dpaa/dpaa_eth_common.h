@@ -99,6 +99,8 @@ void dpaa_eth_init_ports(struct mac_device *mac_dev,
 			 struct device *dev);
 void dpa_release_sgt(struct qm_sg_entry *sgt);
 void dpa_fd_release(const struct net_device *net_dev, const struct qm_fd *fd);
+void count_ern(struct dpa_percpu_priv *percpu_priv,
+	       const struct qm_mr_entry *msg);
 int dpa_enable_tx_csum(struct dpa_priv *priv,
 		       struct sk_buff *skb,
 		       struct qm_fd *fd,

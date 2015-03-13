@@ -93,6 +93,15 @@ static void dpa_rx_error(struct net_device *net_dev,
 
 	percpu_priv->stats.rx_errors++;
 
+	if (fd->status & FM_FD_ERR_DMA)
+		percpu_priv->rx_errors.dme++;
+	if (fd->status & FM_FD_ERR_PHYSICAL)
+		percpu_priv->rx_errors.fpe++;
+	if (fd->status & FM_FD_ERR_SIZE)
+		percpu_priv->rx_errors.fse++;
+	if (fd->status & FM_FD_ERR_PRS_HDR_ERR)
+		percpu_priv->rx_errors.phe++;
+
 	dpa_fd_release(net_dev, fd);
 }
 
@@ -157,6 +166,8 @@ static void dpa_tx_conf(struct net_device *net_dev,
 
 		percpu_priv->stats.tx_errors++;
 	}
+
+	percpu_priv->tx_confirm++;
 
 	skb = dpa_cleanup_tx_fd(priv, fd);
 
@@ -287,6 +298,7 @@ static void priv_ern(struct qman_portal *portal,
 
 	percpu_priv->stats.tx_dropped++;
 	percpu_priv->stats.tx_fifo_errors++;
+	count_ern(percpu_priv, msg);
 
 	/* If we intended this buffer to go into the pool
 	 * when the FM was done, we need to put it in
