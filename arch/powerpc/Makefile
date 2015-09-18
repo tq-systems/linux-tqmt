@@ -304,13 +304,13 @@ PHONY += corenet32_smp_defconfig
 corenet32_smp_defconfig:
 	$(call merge_into_defconfig,corenet_basic_defconfig,\
 		85xx-32bit 85xx-smp 85xx-hw fsl-emb-nonhw pamu\
-		qbman)
+		qbman fman)
 
 PHONY += corenet64_smp_defconfig
 corenet64_smp_defconfig:
 	$(call merge_into_defconfig,corenet_basic_defconfig,\
 		85xx-64bit 85xx-smp altivec 85xx-hw fsl-emb-nonhw pamu\
-		qbman)
+		qbman fman)
 
 PHONY += mpc86xx_defconfig
 mpc86xx_defconfig:
