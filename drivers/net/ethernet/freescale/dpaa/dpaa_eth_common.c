@@ -117,6 +117,10 @@ int dpa_netdev_init(struct net_device *net_dev,
 	net_dev->hw_features |= (NETIF_F_IP_CSUM | NETIF_F_IPV6_CSUM |
 				 NETIF_F_LLTX);
 
+	net_dev->hw_features |= NETIF_F_SG | NETIF_F_HIGHDMA;
+	/* The kernels enables GSO automatically, if we declare NETIF_F_SG.
+	 * For conformity, we'll still declare GSO explicitly.
+	 */
 	net_dev->features |= NETIF_F_GSO;
 
 	net_dev->priv_flags |= IFF_LIVE_ADDR_CHANGE;
@@ -1194,10 +1198,42 @@ void dpaa_eth_init_ports(struct mac_device *mac_dev,
 			      port_fqs->rx_defq, &buf_layout[RX]);
 }
 
-void dpa_fd_release(const struct net_device *net_dev, const struct qm_fd *fd)
+void dpa_release_sgt(struct qm_sg_entry *sgt)
 {
 	struct dpa_bp *dpa_bp;
+	struct bm_buffer bmb[DPA_BUFF_RELEASE_MAX];
+	int i = 0, j, timeout = 100;
+
+	memset(bmb, 0, sizeof(bmb));
+
+	do {
+		dpa_bp = dpa_bpid2pool(sgt[i].bpid);
+		WARN_ON(!dpa_bp);
+
+		j = 0;
+		do {
+			WARN_ON(sgt[i].extension);
+
+			bmb[j].hi = sgt[i].addr_hi;
+			bmb[j].lo = be32_to_cpu(sgt[i].addr_lo);
+
+			j++; i++;
+		} while (j < ARRAY_SIZE(bmb) &&
+				!sgt[i - 1].final &&
+				sgt[i - 1].bpid == sgt[i].bpid);
+
+		while (bman_release(dpa_bp->pool, bmb, j, 0) && --timeout)
+			cpu_relax();
+	} while (!sgt[i - 1].final);
+}
+
+void dpa_fd_release(const struct net_device *net_dev, const struct qm_fd *fd)
+{
+	struct qm_sg_entry *sgt;
+	struct dpa_bp *dpa_bp;
 	struct bm_buffer bmb;
+	dma_addr_t addr;
+	void *vaddr;
 	int timeout = 100;
 
 	memset(&bmb, 0, sizeof(bmb));
@@ -1206,7 +1242,23 @@ void dpa_fd_release(const struct net_device *net_dev, const struct qm_fd *fd)
 	dpa_bp = dpa_bpid2pool(fd->bpid);
 	WARN_ON(!dpa_bp);
 
-	WARN_ON(fd->format == qm_fd_sg);
+	if (fd->format == qm_fd_sg) {
+		vaddr = phys_to_virt(fd->addr);
+		sgt = vaddr + dpa_fd_offset(fd);
+
+		dma_unmap_single(dpa_bp->dev, qm_fd_addr(fd), dpa_bp->size,
+				 DMA_BIDIRECTIONAL);
+
+		dpa_release_sgt(sgt);
+
+		addr = dma_map_single(dpa_bp->dev, vaddr, dpa_bp->size,
+				      DMA_BIDIRECTIONAL);
+		if (dma_mapping_error(dpa_bp->dev, addr)) {
+			dev_err(dpa_bp->dev, "DMA mapping failed");
+			return;
+		}
+		bm_buffer_set64(&bmb, addr);
+	}
 
 	while (bman_release(dpa_bp->pool, &bmb, 1, 0) && --timeout)
 		cpu_relax();
