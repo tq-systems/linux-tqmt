@@ -15,4 +15,16 @@ config FSL_DPA_CHECKING
 		Compiles in additional checks to sanity-check the drivers and
 		any use of it by other code. Not recommended for performance
 
+config FSL_BMAN
+        bool "BMan Configuration Driver"
+        default n
+        help
+                This driver initalizes the global setting for the Buffer Manager
+
+                If this linux image is running natively, you need this option.
+                If this linux image is running as a guest OS under the
+                hypervisor, only one guest OS ("the control plane") needs this
+                option.
+
+
 endif # FSL_DPA
