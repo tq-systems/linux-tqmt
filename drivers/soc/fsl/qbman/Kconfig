@@ -1,0 +1,18 @@
+menuconfig FSL_DPA
+	bool "Freescale DPAA support"
+	depends on FSL_SOC
+	default n
+	help
+		FSL Data-Path Acceleration Architecture drivers
+
+		These are not the actual Ethernet driver(s)
+
+if FSL_DPA
+
+config FSL_DPA_CHECKING
+	bool "additional driver checking"
+	help
+		Compiles in additional checks to sanity-check the drivers and
+		any use of it by other code. Not recommended for performance
+
+endif # FSL_DPA
