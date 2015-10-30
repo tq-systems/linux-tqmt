@@ -26,5 +26,12 @@ config FSL_BMAN
                 hypervisor, only one guest OS ("the control plane") needs this
                 option.
 
+config FSL_BMAN_PORTAL
+        bool "BMan Portal Support"
+        default n
+        help
+                FSL BMan portal driver.  This driver enables Buffer
+                Manager Portal access
+
 
 endif # FSL_DPA
