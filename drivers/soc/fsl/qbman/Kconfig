@@ -33,5 +33,13 @@ config FSL_BMAN_PORTAL
                 FSL BMan portal driver.  This driver enables Buffer
                 Manager Portal access
 
+config FSL_BMAN_DEBUGFS
+        tristate "BMan debugfs support"
+        depends on DEBUG_FS
+        depends on FSL_BMAN
+        default n
+        help
+                BMan debugfs support
+
 
 endif # FSL_DPA
