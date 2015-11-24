@@ -75,4 +75,4 @@
 	};
 };
 
-/include/ "t1040si-post.dtsi"
+#include "t1040si-post.dtsi"
