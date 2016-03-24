@@ -1,0 +1,389 @@
+/*
+ * preliminary T1042RDB Device Tree Source
+ * including starterkit STKTxxxx
+ *
+ * Copyright 2014 Freescale Semiconductor Inc.
+ *
+ * Redistribution and use in source and binary forms, with or without
+ * modification, are permitted provided that the following conditions are met:
+ *     * Redistributions of source code must retain the above copyright
+ *	 notice, this list of conditions and the following disclaimer.
+ *     * Redistributions in binary form must reproduce the above copyright
+ *	 notice, this list of conditions and the following disclaimer in the
+ *	 documentation and/or other materials provided with the distribution.
+ *     * Neither the name of Freescale Semiconductor nor the
+ *	 names of its contributors may be used to endorse or promote products
+ *	 derived from this software without specific prior written permission.
+ *
+ *
+ * ALTERNATIVELY, this software may be distributed under the terms of the
+ * GNU General Public License ("GPL") as published by the Free Software
+ * Foundation, either version 2 of that License or (at your option) any
+ * later version.
+ *
+ * THIS SOFTWARE IS PROVIDED BY Freescale Semiconductor "AS IS" AND ANY
+ * EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE IMPLIED
+ * WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE ARE
+ * DISCLAIMED. IN NO EVENT SHALL Freescale Semiconductor BE LIABLE FOR ANY
+ * DIRECT, INDIRECT, INCIDENTAL, SPECIAL, EXEMPLARY, OR CONSEQUENTIAL DAMAGES
+ * (INCLUDING, BUT NOT LIMITED TO, PROCUREMENT OF SUBSTITUTE GOODS OR SERVICES;
+ * LOSS OF USE, DATA, OR PROFITS; OR BUSINESS INTERRUPTION) HOWEVER CAUSED AND
+ * ON ANY THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT
+ * (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS
+ * SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
+ */
+
+/* include CPU */
+/include/ "fsl/t104xsi-pre.dtsi"
+/* include ethernet phy header to set rgmii timings in device tree */
+#include <dt-bindings/net/ti-dp83867.h>
+
+/ {
+	model = "tqc,TQMT1042";
+	compatible = "tqc,TQMT1042";
+	interrupt-parent = <&mpic>;
+	#address-cells = <2>;
+	#size-cells = <2>;
+		
+ 	aliases {
+		phy_rgmii_0 = &phy_rgmii_0;
+		phy_rgmii_1 = &phy_rgmii_1;
+/*		phy_sgmii_0 = &phy_sgmii_0; */
+		phy_sgmii_1 = &phy_sgmii_1;
+/*		phy_sgmii_2 = &phy_sgmii_2; */
+	};
+	
+	reserved-memory {
+		#address-cells = <2>;
+		#size-cells = <2>;
+		ranges;
+
+		bman_fbpr: bman-fbpr {
+			size = <0 0x1000000>;
+			alignment = <0 0x1000000>;
+		};
+		qman_fqd: qman-fqd {
+			size = <0 0x400000>;
+			alignment = <0 0x400000>;
+		};
+		qman_pfdr: qman-pfdr {
+			size = <0 0x2000000>;
+			alignment = <0 0x2000000>;
+		};
+	};
+	
+	ifc: localbus@ffe124000 {
+		reg = <0xf 0xfe124000 0 0x2000>;
+		ranges = <0 0 0xf 0xe8000000 0x08000000>;
+
+		nor@0,0 {
+			#address-cells = <1>;
+			#size-cells = <1>;
+			compatible = "cfi-flash";
+			reg = <0x0 0x0 0x8000000>;
+			bank-width = <2>;
+			device-width = <1>;
+			
+			/* reset configuration word */
+			partition@0 {
+				label = "NOR  reset configuration word";
+				reg = <0 0x50>;
+			};
+			/* xx MB linux kernel image */
+			/* partition@? {
+				label = "NOR Linux kernel image";
+				reg =<xx xx>; 
+			}; */	
+			/* xx MB flat device tree blob */
+			/* partition@? {
+				label = "NOR Linux device tree blob";
+				reg =<xx xx>; 
+			}; */	
+			/* xx MB root file system image */
+			/* partition@? {
+				label = "NOR Linux root file system image";
+				reg =<xx xx>; 
+			}; */
+			/* xx MB spare partition */
+			partition@20000 {
+				label = "NOR spare partition";
+				reg =<0x20000 0x800000>; 
+			};
+			/* 64 kB frame manager microcode */
+			partition@0x7f00000 {
+				label = "NOR frame manager microcode";
+				reg = <0x7f00000 0x10000>;
+			};
+			/* 64 kB quicc engine microcode */
+			partition@0x7f10000 {
+				label = "NOR quicc engine microcode";
+				reg = <0x7f10000 0x10000>;
+			};
+			/* 64 kB u-boot environment variables */
+			partition@0x7f20000 {
+				label = "NOR u-boot environment variables";
+				reg = <0x7f20000 0x10000>;
+			};					
+			/* 768 kB u-boot bootloader image */
+			partition@0x7f40000 {
+				label = "NOR u-boot bootloader image";
+				reg = <0x7f40000 0xc0000>;
+			};						
+		};
+	};
+
+	memory {
+		device_type = "memory";
+	};
+	
+	/* debug control and status register */
+	dcsr: dcsr@f00000000 {
+		ranges = <0x00000000 0xf 0x00000000 0x01072000>;
+	};
+	
+	/* buffer manager (part of the data-path acceleration architecture) */ 
+	bportals: bman-portals@ff4000000 {
+		ranges = <0x0 0xf 0xf4000000 0x2000000>;
+	};
+	
+	qportals: qman-portals@ff6000000 {
+		ranges = <0x0 0xf 0xf6000000 0x2000000>;
+	};
+	
+	soc: soc@ffe000000 {
+		ranges = <0x00000000 0xf 0xfe000000 0x1000000>;
+		reg = <0xf 0xfe000000 0 0x00001000>;
+		
+		/* I2C1 */ 
+		 i2c@118000 {
+			/* SE97B temp sensor */
+			temp-sensor@18 {
+				compatible = "jc42";
+				reg = <0x18>;
+			};	 
+			/* SA56000 temp sensor */
+			temp-sensor@4c {
+				compatible = "lm86";
+				reg = <0x4c>;
+			};
+			/* config eeprom */
+			eeprom@50 {
+				compatible = "at,24c02";
+				reg = <0x50>;
+				pagesize = <64>;
+			};
+			/* data eeprom  */
+			eeprom@57 {
+				compatible = "at,24c32";
+				reg = <0x57>;
+				pagesize = <64>;
+			};
+			/* RTC PCF85063A */
+			rtc@51 {
+				compatible = "nxp,pcf85063";
+				reg = <0x51>;
+			};
+		};
+		
+		/* all of the following components are on the STK */
+		/* I2C2 */
+		i2c@118100 {
+			/* PCA9530 PWM */
+			gpio@60 {
+				compatible = "nxp,pca9530";
+				reg = <0x60>;
+			};		
+			/* PCA9554 GPIO: DIP Switches */
+			gpio@20 {
+				compatible = "nxp,pca9554";
+				reg = <0x20>;
+			};				
+			/* PCA9554 GPIO: PCIe & LCD control */
+			gpio@21 {
+				compatible = "nxp,pca9554";
+				reg = <0x21>;
+			};	
+			/* PCA9554 GPIO: SerDes & DIU Mux, LEDs*/
+			gpio@22 {
+				compatible = "nxp,pca9554";
+				reg = <0x22>;
+			};	
+			/* PCA9554 GPIO: XFI control, SGMII INT# */
+			gpio@23 {
+				compatible = "nxp,pca9554";
+				reg = <0x23>;
+			};				
+			/* STMPE touchscreen controller */
+			stmpe811: stmpe811@41 {
+				compatible = "st,stmpe811";
+				reg = <0x41>;
+				wakeup-source;
+				st,autosleep-timeout = <1024>;			
+				stmpe_touchscreen {
+					compatible = "st,stmpe-ts";
+					st,sample-time = <4>;
+					st,mod-12b = <1>;
+					st,ref-sel = <0>;
+					st,adc-freq = <1>;
+					st,ave-ctrl = <1>;
+					st,touch-det-delay = <2>;
+					st,settling = <2>;
+					st,fraction-z = <7>;
+					st,i-drive = <1>;
+				};						
+			};					
+		};
+		 
+		fman0: fman@400000 {
+			sleep = <&rcpm 0x00000008>;
+			
+			/* MAC1: SGMII or QSGMII, 88E11340S */
+			/* SGMII hardware currently disfunctional */
+			enet0: ethernet@e0000 {
+				status = "disabled";
+			};
+			
+			/* MAC2: SGMII, DP83867 */
+			/* SGMII hardware currently disfunctional */
+			enet1: ethernet@e2000 {
+				phy-handle = <&phy_sgmii_1>;
+				phy-connection-type = "sgmii";
+ 			/*	sleep = <&rcpm 0x20000000>; */
+			};
+			
+			/* MAC3: SGMII, 88E1340S */
+			/* SGMII hardware currently disfunctional */
+			enet2: ethernet@e4000 {
+				status = "disabled";
+			};
+			
+			/* MAC4 */
+			enet3: ethernet@e6000 {
+				phy-handle = <&phy_rgmii_0>;
+				phy-connection-type = "rgmii";
+				sleep = <&rcpm 0x10000000>;
+				ti,rx-internal-delay = <DP83867_RGMIIDCTL_2_50_NS>;
+				ti,tx-internal-delay = <DP83867_RGMIIDCTL_2_00_NS>;
+			};
+			
+			/* MAC5 */
+			enet4: ethernet@e8000 {
+				phy-handle = <&phy_rgmii_1>;
+				phy-connection-type = "rgmii";
+ 				sleep = <&rcpm 0x08000000>;
+ 				ti,rx-internal-delay = <DP83867_RGMIIDCTL_2_50_NS>;
+				ti,tx-internal-delay = <DP83867_RGMIIDCTL_2_00_NS>;
+			};
+			
+			/* external, dedicated MDIO */
+			mdio0: mdio@fc000 {
+				phy_rgmii_0: ethernet-phy@0e {
+					reg = <0x0e>;
+				};
+				phy_rgmii_1: ethernet-phy@05 {
+					reg = <0x05>;
+				};
+				phy_sgmii_1: ethernet-phy@03 {
+					reg = <0x03>;
+				};
+			};
+		};
+	};
+	
+	pci0: pcie@ffe240000 {
+		status = "disabled";
+	};
+
+	pci1: pcie@ffe250000 {
+		reg = <0xf 0xfe250000 0 0x10000>;
+		ranges = <0x02000000 0x0 0xe0000000 0xc 0x10000000 0x0 0x10000000
+			  0x01000000 0x0 0x00000000 0xf 0xf8010000 0x0 0x00010000>;
+		pcie@0 {
+			ranges = <0x02000000 0 0xe0000000
+				  0x02000000 0 0xe0000000
+				  0 0x10000000
+
+				  0x01000000 0 0x00000000
+				  0x01000000 0 0x00000000
+				  0 0x00010000>;
+		};
+	};
+
+	pci2: pcie@ffe260000 {
+		reg = <0xf 0xfe260000 0 0x10000>;
+		ranges = <0x02000000 0 0xe0000000 0xc 0x20000000 0 0x10000000
+			  0x01000000 0 0x00000000 0xf 0xf8020000 0 0x00010000>;
+		pcie@0 {
+			ranges = <0x02000000 0 0xe0000000
+				  0x02000000 0 0xe0000000
+				  0 0x10000000
+
+				  0x01000000 0 0x00000000
+				  0x01000000 0 0x00000000
+				  0 0x00010000>;
+		};
+	};
+
+	pci3: pcie@ffe270000 {
+		reg = <0xf 0xfe270000 0 0x10000>;
+		ranges = <0x02000000 0 0xe0000000 0xc 0x30000000 0 0x10000000
+			  0x01000000 0 0x00000000 0xf 0xf8030000 0 0x00010000>;
+		pcie@0 {
+			ranges = <0x02000000 0 0xe0000000
+				  0x02000000 0 0xe0000000
+				  0 0x10000000
+
+				  0x01000000 0 0x00000000
+				  0x01000000 0 0x00000000
+				  0 0x00010000>;
+		};
+	};
+	        
+	/* bp dts definition is borrowed from other USDPAA dts */
+	bp6: buffer-pool@6 {
+		compatible = "fsl,t1040-bpool", "fsl,bpool";
+		fsl,bpid = <6>;
+		fsl,bpool-ethernet-cfg = <0 0 0 1728 0 0xfeedabba>;
+		fsl,bpool-thresholds = <0x100 0x300 0x0 0x0>;
+	};
+
+	fsl,dpaa {
+		compatible = "fsl,t1040-dpaa", "fsl,dpaa";
+		ethernet@0 {
+			compatible = "fsl,t1040-dpa-ethernet", "fsl,dpa-ethernet";
+			fsl,fman-mac = <&enet0>;
+		};
+		ethernet@1 {
+			compatible = "fsl,t1040-dpa-ethernet", "fsl,dpa-ethernet";
+			fsl,fman-mac = <&enet1>;
+		};
+		ethernet@2 {
+			compatible = "fsl,t1040-dpa-ethernet", "fsl,dpa-ethernet";
+			fsl,fman-mac = <&enet2>;
+		};
+		ethernet@3 {
+			compatible = "fsl,t1040-dpa-ethernet", "fsl,dpa-ethernet";
+			fsl,fman-mac = <&enet3>;
+		};
+		ethernet@4 {
+			compatible = "fsl,t1040-dpa-ethernet", "fsl,dpa-ethernet";
+			fsl,fman-mac = <&enet4>;
+		};
+		/* enable one offline port */
+		/* TODO: fman0_oh2 not defined in mainline kernel; preliminarily disabled */ 
+		/* dpa-fman0-oh@2 {
+			compatible = "fsl,dpa-oh"; */
+			/* Define frame queues for the OH port */
+			/* <OH Rx error, OH Rx default> */
+		/*	fsl,qman-frame-queues-oh = <0x68 1 0x69 1>; 
+			fsl,bman-buffer-pools = <&bp6>;
+			fsl,qman-frame-queues-tx = <0x90 8>;
+			fsl,fman-oh-port = <&fman0_oh2>;
+		};*/
+	}; 
+	
+};
+
+ /include/ "fsl/t1042si-post.dtsi" 
+ /* experimental */
+/* /include/ "fsl/qoriq-dpaa-res3.dtsi" */
