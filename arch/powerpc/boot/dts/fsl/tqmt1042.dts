@@ -34,7 +34,7 @@
  */
 
 /* include CPU */
-/include/ "fsl/t104xsi-pre.dtsi"
+#include "t104xsi-pre.dtsi"
 /* include ethernet phy header to set rgmii timings in device tree */
 #include <dt-bindings/net/ti-dp83867.h>
 
@@ -48,9 +48,9 @@
  	aliases {
 		phy_rgmii_0 = &phy_rgmii_0;
 		phy_rgmii_1 = &phy_rgmii_1;
-/*		phy_sgmii_0 = &phy_sgmii_0; */
+		phy_sgmii_0 = &phy_sgmii_0; 
 		phy_sgmii_1 = &phy_sgmii_1;
-/*		phy_sgmii_2 = &phy_sgmii_2; */
+		phy_sgmii_2 = &phy_sgmii_2; 
 	};
 	
 	reserved-memory {
@@ -238,23 +238,21 @@
 			sleep = <&rcpm 0x00000008>;
 			
 			/* MAC1: SGMII or QSGMII, 88E11340S */
-			/* SGMII hardware currently disfunctional */
 			enet0: ethernet@e0000 {
-				status = "disabled";
+				phy-handle = <&phy_sgmii_0>;
+				phy-connection-type = "sgmii";
 			};
 			
 			/* MAC2: SGMII, DP83867 */
-			/* SGMII hardware currently disfunctional */
 			enet1: ethernet@e2000 {
 				phy-handle = <&phy_sgmii_1>;
 				phy-connection-type = "sgmii";
  			/*	sleep = <&rcpm 0x20000000>; */
 			};
 			
-			/* MAC3: SGMII, 88E1340S */
-			/* SGMII hardware currently disfunctional */
 			enet2: ethernet@e4000 {
-				status = "disabled";
+				phy-handle = <&phy_sgmii_2>;
+				phy-connection-type = "sgmii";
 			};
 			
 			/* MAC4 */
@@ -283,8 +281,14 @@
 				phy_rgmii_1: ethernet-phy@05 {
 					reg = <0x05>;
 				};
+				phy_sgmii_0: ethernet-phy@1D {
+					reg = <0x1D>;
+				};
 				phy_sgmii_1: ethernet-phy@03 {
 					reg = <0x03>;
+				};
+				phy_sgmii_2: ethernet-phy@1C {
+					reg = <0x1C>;
 				};
 			};
 		};
@@ -346,44 +350,8 @@
 		fsl,bpool-ethernet-cfg = <0 0 0 1728 0 0xfeedabba>;
 		fsl,bpool-thresholds = <0x100 0x300 0x0 0x0>;
 	};
-
-	fsl,dpaa {
-		compatible = "fsl,t1040-dpaa", "fsl,dpaa";
-		ethernet@0 {
-			compatible = "fsl,t1040-dpa-ethernet", "fsl,dpa-ethernet";
-			fsl,fman-mac = <&enet0>;
-		};
-		ethernet@1 {
-			compatible = "fsl,t1040-dpa-ethernet", "fsl,dpa-ethernet";
-			fsl,fman-mac = <&enet1>;
-		};
-		ethernet@2 {
-			compatible = "fsl,t1040-dpa-ethernet", "fsl,dpa-ethernet";
-			fsl,fman-mac = <&enet2>;
-		};
-		ethernet@3 {
-			compatible = "fsl,t1040-dpa-ethernet", "fsl,dpa-ethernet";
-			fsl,fman-mac = <&enet3>;
-		};
-		ethernet@4 {
-			compatible = "fsl,t1040-dpa-ethernet", "fsl,dpa-ethernet";
-			fsl,fman-mac = <&enet4>;
-		};
-		/* enable one offline port */
-		/* TODO: fman0_oh2 not defined in mainline kernel; preliminarily disabled */ 
-		/* dpa-fman0-oh@2 {
-			compatible = "fsl,dpa-oh"; */
-			/* Define frame queues for the OH port */
-			/* <OH Rx error, OH Rx default> */
-		/*	fsl,qman-frame-queues-oh = <0x68 1 0x69 1>; 
-			fsl,bman-buffer-pools = <&bp6>;
-			fsl,qman-frame-queues-tx = <0x90 8>;
-			fsl,fman-oh-port = <&fman0_oh2>;
-		};*/
-	}; 
 	
 };
 
- /include/ "fsl/t1042si-post.dtsi" 
- /* experimental */
-/* /include/ "fsl/qoriq-dpaa-res3.dtsi" */
+#include "t1042si-post.dtsi" 
+#include "qoriq-dpaa-res3.dtsi"
