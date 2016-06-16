@@ -51,6 +51,7 @@
 		phy_sgmii_0 = &phy_sgmii_0; 
 		phy_sgmii_1 = &phy_sgmii_1;
 		phy_sgmii_2 = &phy_sgmii_2; 
+		phy_sgmii_3 = &phy_sgmii_3;
 	};
 	
 	reserved-memory {
@@ -235,49 +236,53 @@
 		fman0: fman@400000 {
 			sleep = <&rcpm 0x00000008>;
 			
-			/* MAC1: SGMII or QSGMII, 88E11340S */
+			/* MAC1: SGMII 88E11340S
+			 * STKT allows SGMII 88E11340S or QSGMII 88E11340S
+			 * Only SGMII 88E11340S implemented as T1042
+			 * provides no QSGMII SerDes */
 			enet0: ethernet@e0000 {
 				phy-handle = <&phy_sgmii_0>;
 				phy-connection-type = "sgmii";
 			};
 			
-			/* MAC2: SGMII, DP83867 */
+			/* MAC2: SGMII DP83867 */
 			enet1: ethernet@e2000 {
 				phy-handle = <&phy_sgmii_1>;
 				phy-connection-type = "sgmii";
- 			/*	sleep = <&rcpm 0x20000000>; */
 			};
 			
+			/* MAC3: SGMII 88E11340S */
 			enet2: ethernet@e4000 {
 				phy-handle = <&phy_sgmii_2>;
 				phy-connection-type = "sgmii";
 			};
 			
-			/* MAC4 */
+			/* MAC4: RGMII DP83867 or SGMII DP83867 */
+			/* only RGMII DP83867 implemented so far */
 			enet3: ethernet@e6000 {
 				phy-handle = <&phy_rgmii_0>;
-				phy-connection-type = "rgmii";
-				sleep = <&rcpm 0x10000000>;
-				ti,rx-internal-delay = <DP83867_RGMIIDCTL_2_50_NS>;
-				ti,tx-internal-delay = <DP83867_RGMIIDCTL_2_00_NS>;
+				phy-connection-type = "rgmii-id";
 			};
 			
-			/* MAC5 */
+			/* MAC5: RGMII DP83867 */
 			enet4: ethernet@e8000 {
 				phy-handle = <&phy_rgmii_1>;
-				phy-connection-type = "rgmii";
- 				sleep = <&rcpm 0x08000000>;
- 				ti,rx-internal-delay = <DP83867_RGMIIDCTL_2_50_NS>;
-				ti,tx-internal-delay = <DP83867_RGMIIDCTL_2_00_NS>;
+				phy-connection-type = "rgmii-id";
 			};
 			
 			/* external, dedicated MDIO */
 			mdio0: mdio@fc000 {
 				phy_rgmii_0: ethernet-phy@0e {
 					reg = <0x0e>;
+					ti,tx-internal-delay = <DP83867_RGMIIDCTL_2_50_NS>;
+					ti,rx-internal-delay = <DP83867_RGMIIDCTL_2_00_NS>;
+					ti,fifo-depth = <DP83867_PHYCR_FIFO_DEPTH_4_B_NIB>;
 				};
 				phy_rgmii_1: ethernet-phy@05 {
 					reg = <0x05>;
+					ti,tx-internal-delay = <DP83867_RGMIIDCTL_2_50_NS>;
+					ti,rx-internal-delay = <DP83867_RGMIIDCTL_2_00_NS>;
+					ti,fifo-depth = <DP83867_PHYCR_FIFO_DEPTH_4_B_NIB>;
 				};
 				phy_sgmii_0: ethernet-phy@1D {
 					reg = <0x1D>;
@@ -287,6 +292,9 @@
 				};
 				phy_sgmii_2: ethernet-phy@1C {
 					reg = <0x1C>;
+				};
+				phy_sgmii_3: ethernet-phy@01 {
+					reg = <0x01>;
 				};
 			};
 		};
