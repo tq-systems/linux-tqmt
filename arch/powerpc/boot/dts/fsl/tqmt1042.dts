@@ -86,43 +86,41 @@
 			
 			/* reset configuration word */
 			partition@0 {
-				label = "NOR  reset configuration word";
-				reg = <0 0x50>;
+				label = "NOR reset configuration word";
+				reg = <0 0x20000>;
 			};
-			/* xx MB linux kernel image */
-			/* partition@? {
-				label = "NOR Linux kernel image";
-				reg =<xx xx>; 
-			}; */	
-			/* xx MB flat device tree blob */
-			/* partition@? {
-				label = "NOR Linux device tree blob";
-				reg =<xx xx>; 
-			}; */	
-			/* xx MB root file system image */
-			/* partition@? {
-				label = "NOR Linux root file system image";
-				reg =<xx xx>; 
-			}; */
-			/* xx MB spare partition */
+			/* 8 MB linux kernel image */
 			partition@20000 {
+				label = "NOR Linux kernel image";
+				reg =<0x20000 0x800000>;
+			};
+			/* 64 kB flat device tree blob */
+			partition@820000 {
+				label = "NOR Linux device tree blob";
+				reg =<0x820000 0x20000>;
+			};
+			/* 64 MB root file system image */
+			partition@840000 {
+				label = "NOR Linux root file system image";
+				reg =<0x840000 0x4000000>;
+			};
+			/* 54 MB spare partition */
+			partition@C40000 {
 				label = "NOR spare partition";
-				reg =<0x20000 0x800000>; 
+				reg =<0xc40000 0x3600000>;
 			};
-			/* 64 kB frame manager microcode */
+			/* 64 kB frame manager microcode + 64 kB quicc engine microcode
+			 * common partition because sector boundary > default offset
+			 * frame manager microcode @ 0xeff00000, size 0x10000
+			 * quicc engine microcode @ 0xeff10000, size 0x10000 */
 			partition@0x7f00000 {
-				label = "NOR frame manager microcode";
-				reg = <0x7f00000 0x10000>;
-			};
-			/* 64 kB quicc engine microcode */
-			partition@0x7f10000 {
-				label = "NOR quicc engine microcode";
-				reg = <0x7f10000 0x10000>;
+				label = "NOR frame manager microcode + quicc engine microcode";
+				reg = <0x7f00000 0x20000>;
 			};
 			/* 64 kB u-boot environment variables */
 			partition@0x7f20000 {
 				label = "NOR u-boot environment variables";
-				reg = <0x7f20000 0x10000>;
+				reg = <0x7f20000 0x20000>;
 			};					
 			/* 768 kB u-boot bootloader image */
 			partition@0x7f40000 {
