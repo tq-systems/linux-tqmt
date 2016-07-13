@@ -2683,7 +2683,6 @@ CONFIG_UIO=y
 # CONFIG_UIO_FSL_ELBC_GPCM is not set
 # CONFIG_UIO_PRUSS is not set
 # CONFIG_UIO_MF624 is not set
-# CONFIG_VFIO is not set
 CONFIG_VIRT_DRIVERS=y
 CONFIG_FSL_HV_MANAGER=y
 
@@ -2725,14 +2724,7 @@ CONFIG_CLK_QORIQ=y
 # CONFIG_SH_TIMER_TMU is not set
 # CONFIG_EM_TIMER_STI is not set
 # CONFIG_MAILBOX is not set
-CONFIG_IOMMU_API=y
-CONFIG_IOMMU_SUPPORT=y
-
-#
-# Generic IOMMU Pagetable Support
-#
-CONFIG_OF_IOMMU=y
-CONFIG_FSL_PAMU=y
+# CONFIG_IOMMU_SUPPORT is not set
 
 #
 # Remoteproc drivers
