@@ -67,6 +67,7 @@ struct mac_priv_s {
 	struct fixed_phy_status		*fixed_link;
 	u16				speed;
 	u16				max_speed;
+	phy_interface_t			external_phy_if;
 
 	int (*enable)(struct fman_mac *mac_dev, enum comm_mode mode);
 	int (*disable)(struct fman_mac *mac_dev, enum comm_mode mode);
@@ -476,8 +477,14 @@ static int init_phy(struct net_device *net_dev,
 	struct phy_device	*phy_dev;
 	struct mac_priv_s	*priv = mac_dev->priv;
 
-	phy_dev = of_phy_connect(net_dev, priv->phy_node, adj_lnk, 0,
+	if (priv->external_phy_if) {
+		phy_dev = of_phy_connect(net_dev, priv->phy_node, adj_lnk, 0,
+				 priv->external_phy_if);
+	}
+	else {
+		phy_dev = of_phy_connect(net_dev, priv->phy_node, adj_lnk, 0,
 				 priv->phy_if);
+	}
 	if (!phy_dev) {
 		netdev_err(net_dev, "Could not connect to PHY\n");
 		return -ENODEV;
@@ -879,6 +886,23 @@ static int mac_probe(struct platform_device *_of_dev)
 		priv->phy_if = PHY_INTERFACE_MODE_MII;
 	} else {
 		priv->phy_if = str2phy(char_prop);
+	}
+
+	/*
+	 * Dirty Workaround:
+	 * Get the true external PHY's connection type
+	 * Workaround as FMAN overwrites the "phy-connection-type"-property
+	 * with "rgmii" if "rgmii-id" is noted in the device tree.
+	 * The new variable "external_phy_if" is successively used in the
+	 * "init_phy" function further above in this .c-file.
+	 * See also: https://community.nxp.com/thread/398029
+	 */
+	char_prop = (const char *)of_get_property(mac_node,
+						  "external-phy-connection-type", NULL);
+	if (char_prop) {
+		dev_info(dev,"'external-phy-connection-type' property present in device tree.\n");
+		dev_info(dev,"'external-phy-connection-type' set to %s \n", char_prop);
+		priv->external_phy_if = str2phy(char_prop);
 	}
 
 	priv->speed		= phy2speed[priv->phy_if];

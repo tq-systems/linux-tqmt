@@ -263,12 +263,14 @@
 			enet3: ethernet@e6000 {
 				phy-handle = <&phy_rgmii_0>;
 				phy-connection-type = "rgmii-id";
+				external-phy-connection-type = "rgmii-id";
 			};
 			
 			/* MAC5: RGMII DP83867 */
 			enet4: ethernet@e8000 {
 				phy-handle = <&phy_rgmii_1>;
 				phy-connection-type = "rgmii-id";
+				external-phy-connection-type = "rgmii-id";
 			};
 			
 			/* external, dedicated MDIO */
