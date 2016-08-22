@@ -46,11 +46,11 @@
 	soc@ffe000000 {
 		fman@400000 {
 			ethernet@e0000 {
-			       status = "disabled";
+				   status = "disabled";
 			};
 
 			ethernet@e2000 {
-			       status = "disabled";
+				   status = "disabled";
 			};
 
 			ethernet@e4000 {
