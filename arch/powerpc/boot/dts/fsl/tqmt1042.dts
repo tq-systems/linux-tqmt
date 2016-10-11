@@ -107,9 +107,9 @@
 				reg =<0x840000 0x4000000>;
 			};
 			/* 54 MB spare partition */
-			partition@C40000 {
+			partition@4840000 {
 				label = "NOR spare partition";
-				reg =<0xc40000 0x3600000>;
+				reg =<0x4840000 0x3600000>;
 			};
 			/* 64 kB frame manager microcode + 64 kB quicc engine microcode
 			 * common partition because sector boundary > default offset
