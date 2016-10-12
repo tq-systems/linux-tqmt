@@ -240,7 +240,8 @@
 			/* MAC1: SGMII 88E11340S
 			 * STKT allows SGMII 88E11340S or QSGMII 88E11340S
 			 * Only SGMII 88E11340S implemented as T1042
-			 * provides no QSGMII SerDes */
+			 * provides no QSGMII SerDes
+			 */
 			enet0: ethernet@e0000 {
 				phy-handle = <&phy_sgmii_0>;
 				phy-connection-type = "sgmii";
@@ -258,8 +259,11 @@
 				phy-connection-type = "sgmii";
 			};
 			
-			/* MAC4: RGMII DP83867 or SGMII DP83867 */
-			/* only RGMII DP83867 implemented so far */
+			/* MAC4: RGMII DP83867 or SGMII DP83867
+			 * STKT allows RGMII DP83867 or SGMII DP83867
+			 * RGMII DP83867 implemented in this device tree
+			 * for SGMII DP83867 see tqmt1042_serdes8e.dts
+			 */
 			enet3: ethernet@e6000 {
 				phy-handle = <&phy_rgmii_0>;
 				phy-connection-type = "rgmii-id";
