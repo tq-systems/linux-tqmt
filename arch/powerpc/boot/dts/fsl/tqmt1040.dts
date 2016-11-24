@@ -49,9 +49,7 @@
  	aliases {
 		phy_rgmii_0 = &phy_rgmii_0;
 		phy_rgmii_1 = &phy_rgmii_1;
-		phy_sgmii_0 = &phy_sgmii_0; 
 		phy_sgmii_1 = &phy_sgmii_1;
-		phy_sgmii_2 = &phy_sgmii_2; 
 		phy_sgmii_3 = &phy_sgmii_3;
 	};
 	
@@ -237,13 +235,11 @@
 		fman0: fman@400000 {
 			sleep = <&rcpm 0x00000008>;
 			
-			/* MAC1: SGMII 88E11340S
+			/* MAC1: QSGMII 88E11340S
 			 * STKT allows SGMII 88E11340S or QSGMII 88E11340S
-			 * Only SGMII 88E11340S implemented as T1042
-			 * provides no QSGMII SerDes
 			 */
 			enet0: ethernet@e0000 {
-				phy-handle = <&phy_sgmii_0>;
+				fixed-link = <0 1 1000 0 0>;
 				phy-connection-type = "sgmii";
 			};
 			
@@ -255,14 +251,13 @@
 			
 			/* MAC3: SGMII 88E11340S */
 			enet2: ethernet@e4000 {
-				phy-handle = <&phy_sgmii_2>;
+				fixed-link = <1 1 1000 0 0>;
 				phy-connection-type = "sgmii";
 			};
 			
 			/* MAC4: RGMII DP83867 or SGMII DP83867
 			 * STKT allows RGMII DP83867 or SGMII DP83867
 			 * RGMII DP83867 implemented in this device tree
-			 * for SGMII DP83867 see tqmt1042_serdes8e.dts
 			 */
 			enet3: ethernet@e6000 {
 				phy-handle = <&phy_rgmii_0>;
@@ -291,19 +286,48 @@
 					ti,rx-internal-delay = <DP83867_RGMIIDCTL_2_00_NS>;
 					ti,fifo-depth = <DP83867_PHYCR_FIFO_DEPTH_4_B_NIB>;
 				};
-				phy_sgmii_0: ethernet-phy@1D {
-					reg = <0x1D>;
-				};
 				phy_sgmii_1: ethernet-phy@03 {
 					reg = <0x03>;
-				};
-				phy_sgmii_2: ethernet-phy@1C {
-					reg = <0x1C>;
 				};
 				phy_sgmii_3: ethernet-phy@01 {
 					reg = <0x01>;
 				};
+				phy_qsgmii_0: ethernet-phy@1C {
+					reg = <0x1C>;
+					interrupts = <0 1 0 0>;
+				};
+                                phy_qsgmii_1: ethernet-phy@1D {
+                                        reg = <0x1D>;
+                                        interrupts = <0 1 0 0>;
+                                };
+                                phy_qsgmii_2: ethernet-phy@1E {
+                                        reg = <0x1E>;
+                                        interrupts = <0 1 0 0>;
+                                };
+                                phy_qsgmii_3: ethernet-phy@1F {
+                                        reg = <0x1F>;
+                                        interrupts = <0 1 0 0>;
+                                };
 			};
+		};
+
+		l2switch@800000 {
+			port@100000 {
+				phy-connection-type = "qsgmii";
+				phy-handle = <&phy_qsgmii_0>;
+			};
+                        port@110000 {
+                                phy-connection-type = "qsgmii";
+                                phy-handle = <&phy_qsgmii_1>;
+                        };
+                        port@120000 {
+                                phy-connection-type = "qsgmii";
+                                phy-handle = <&phy_qsgmii_2>;
+                        };
+                        port@130000 {
+                                phy-connection-type = "qsgmii";
+                                phy-handle = <&phy_qsgmii_3>;
+                        };
 		};
 	};
 	
