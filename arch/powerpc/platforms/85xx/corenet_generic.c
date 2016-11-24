@@ -163,6 +163,7 @@ static const char * const boards[] __initconst = {
 	"keymile,kmcoge4",
 	"varisys,CYRUS",
 	"tqc,TQMT1042",
+	"tqc,TQMT1040",
 	NULL
 };
 
