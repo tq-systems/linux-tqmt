@@ -258,6 +258,12 @@ static const struct of_device_id corenet_board_matches[] = {
 	{
 		.compatible = "fsl,T1042D4RDB",
 	},
+        {
+                .compatible = "tqc,TQMT1042",
+        },
+        {
+                .compatible = "tqc,TQMT1040",
+        },
 	{},
 };
 
