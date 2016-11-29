@@ -33,6 +33,7 @@
 /* Extended Registers */
 #define DP83867_RGMIICTL	0x0032
 #define DP83867_RGMIIDCTL	0x0086
+#define DP83867_IOMUXCFG	0x0170
 
 #define DP83867_SW_RESET	BIT(15)
 #define DP83867_SW_RESTART	BIT(14)
@@ -61,10 +62,15 @@
 /* RGMIIDCTL bits */
 #define DP83867_RGMII_TX_CLK_DELAY_SHIFT	4
 
+/* IOMUXCFG bits */
+#define DP83867_IOMUXCFG_CLK_O_SEL_SHIFT        8
+#define DP83867_IOMUXCFG_CLK_O_SEL_MASK         0x1F00
+
 struct dp83867_private {
 	int rx_id_delay;
 	int tx_id_delay;
 	int fifo_depth;
+	int clk_out_sel;
 	int values_are_sane;
 };
 
@@ -128,6 +134,11 @@ static int dp83867_of_init(struct phy_device *phydev)
 				   &dp83867->fifo_depth);
 	if (ret)
 		goto invalid_dt;
+
+        ret = of_property_read_u32(of_node, "ti,dp83867-clk-out-sel",
+                                   &dp83867->clk_out_sel);
+        if (ret)
+                goto invalid_dt;
 
 	dp83867->values_are_sane = 1;
 
@@ -208,6 +219,14 @@ static int dp83867_config_init(struct phy_device *phydev)
 		phy_write_mmd_indirect(phydev, DP83867_RGMIIDCTL,
 				       DP83867_DEVADDR, phydev->addr, delay);
 	}
+
+	/* set Clock Output Select in IO_MUX_CFG register */
+	val = phy_read_mmd_indirect(phydev, DP83867_IOMUXCFG,
+                                    DP83867_DEVADDR, phydev->addr);
+	val &= ~DP83867_IOMUXCFG_CLK_O_SEL_MASK;
+	val |= (dp83867->clk_out_sel << DP83867_IOMUXCFG_CLK_O_SEL_SHIFT);
+        phy_write_mmd_indirect(phydev, DP83867_IOMUXCFG,
+                               DP83867_DEVADDR, phydev->addr, val);
 
 	return 0;
 }
