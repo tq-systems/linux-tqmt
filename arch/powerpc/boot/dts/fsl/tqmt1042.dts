@@ -284,12 +284,14 @@
 					ti,tx-internal-delay = <DP83867_RGMIIDCTL_2_50_NS>;
 					ti,rx-internal-delay = <DP83867_RGMIIDCTL_2_00_NS>;
 					ti,fifo-depth = <DP83867_PHYCR_FIFO_DEPTH_4_B_NIB>;
+					ti,dp83867-clk-out-sel = <DP83867_IOMUXCFG_CLK_O_SEL_REF_CLK>;
 				};
 				phy_rgmii_1: ethernet-phy@05 {
 					reg = <0x05>;
 					ti,tx-internal-delay = <DP83867_RGMIIDCTL_2_50_NS>;
 					ti,rx-internal-delay = <DP83867_RGMIIDCTL_2_00_NS>;
 					ti,fifo-depth = <DP83867_PHYCR_FIFO_DEPTH_4_B_NIB>;
+					ti,dp83867-clk-out-sel = <DP83867_IOMUXCFG_CLK_O_SEL_CHA_RX>;
 				};
 				phy_sgmii_0: ethernet-phy@1D {
 					reg = <0x1D>;
