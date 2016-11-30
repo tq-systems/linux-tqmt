@@ -290,9 +290,17 @@
 				};
 				phy_sgmii_1: ethernet-phy@03 {
 					reg = <0x03>;
+                                        ti,tx-internal-delay = <DP83867_RGMIIDCTL_2_50_NS>;
+                                        ti,rx-internal-delay = <DP83867_RGMIIDCTL_2_00_NS>;
+                                        ti,fifo-depth = <DP83867_PHYCR_FIFO_DEPTH_4_B_NIB>;
+                                        ti,dp83867-clk-out-sel = <DP83867_IOMUXCFG_CLK_O_SEL_REF_CLK>;
 				};
 				phy_sgmii_3: ethernet-phy@01 {
 					reg = <0x01>;
+                                        ti,tx-internal-delay = <DP83867_RGMIIDCTL_2_50_NS>;
+                                        ti,rx-internal-delay = <DP83867_RGMIIDCTL_2_00_NS>;
+                                        ti,fifo-depth = <DP83867_PHYCR_FIFO_DEPTH_4_B_NIB>;
+                                        ti,dp83867-clk-out-sel = <DP83867_IOMUXCFG_CLK_O_SEL_REF_CLK>;
 				};
 				phy_qsgmii_0: ethernet-phy@1C {
 					reg = <0x1C>;
