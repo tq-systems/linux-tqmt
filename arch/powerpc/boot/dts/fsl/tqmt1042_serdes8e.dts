@@ -1,6 +1,7 @@
 /*
- * preliminary T1042RDB Device Tree Source
+ * TQMT1042 Device Tree Source
  * including starterkit STKTxxxx
+ * Serdes configuration 0x8E 
  *
  * Copyright 2014 Freescale Semiconductor Inc.
  * Copyright 2016 Stefan Lange <s.lange@gateware.de>
