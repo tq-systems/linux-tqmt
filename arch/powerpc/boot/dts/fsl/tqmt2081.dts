@@ -1,0 +1,361 @@
+/*
+ * TQMT2081 Device Tree Source
+ * including starterkit STKTxxxx
+ *
+ * Copyright 2014 - 2015 Freescale Semiconductor Inc.
+ * Copyright 2017 Stefan Lange <s.lange@gateware.de>
+ *
+ * Redistribution and use in source and binary forms, with or without
+ * modification, are permitted provided that the following conditions are met:
+ *     * Redistributions of source code must retain the above copyright
+ *	 notice, this list of conditions and the following disclaimer.
+ *     * Redistributions in binary form must reproduce the above copyright
+ *	 notice, this list of conditions and the following disclaimer in the
+ *	 documentation and/or other materials provided with the distribution.
+ *     * Neither the name of Freescale Semiconductor nor the
+ *	 names of its contributors may be used to endorse or promote products
+ *	 derived from this software without specific prior written permission.
+ *
+ *
+ * ALTERNATIVELY, this software may be distributed under the terms of the
+ * GNU General Public License ("GPL") as published by the Free Software
+ * Foundation, either version 2 of that License or (at your option) any
+ * later version.
+ *
+ * THIS SOFTWARE IS PROVIDED BY Freescale Semiconductor "AS IS" AND ANY
+ * EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE IMPLIED
+ * WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE ARE
+ * DISCLAIMED. IN NO EVENT SHALL Freescale Semiconductor BE LIABLE FOR ANY
+ * DIRECT, INDIRECT, INCIDENTAL, SPECIAL, EXEMPLARY, OR CONSEQUENTIAL DAMAGES
+ * (INCLUDING, BUT NOT LIMITED TO, PROCUREMENT OF SUBSTITUTE GOODS OR SERVICES;
+ * LOSS OF USE, DATA, OR PROFITS; OR BUSINESS INTERRUPTION) HOWEVER CAUSED AND
+ * ON ANY THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT
+ * (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS
+ * SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
+ */
+
+/include/ "t208xsi-pre.dtsi"
+/include/ "t208xrdb.dtsi"
+
+/* include ethernet phy header to set rgmii timings in device tree */
+#include <dt-bindings/net/ti-dp83867.h>
+
+/ {
+	model = "tqc,TQMT2081";
+	compatible = "tqc,TQMT2081";
+	#address-cells = <2>;
+	#size-cells = <2>;
+	interrupt-parent = <&mpic>;
+
+	aliases {
+		phy_rgmii_0 = &phy_rgmii_0;
+		phy_rgmii_1 = &phy_rgmii_1;
+		phy_sgmii_0 = &phy_sgmii_0;
+		phy_sgmii_1 = &phy_sgmii_1;
+		phy_sgmii_2 = &phy_sgmii_2;
+	};
+
+reserved-memory {
+		#address-cells = <2>;
+		#size-cells = <2>;
+		ranges;
+
+		bman_fbpr: bman-fbpr {
+			size = <0 0x1000000>;
+			alignment = <0 0x1000000>;
+		};
+		qman_fqd: qman-fqd {
+			size = <0 0x400000>;
+			alignment = <0 0x400000>;
+		};
+		qman_pfdr: qman-pfdr {
+			size = <0 0x2000000>;
+			alignment = <0 0x2000000>;
+		};
+	};
+
+	ifc: localbus@ffe124000 {
+		reg = <0xf 0xfe124000 0 0x2000>;
+		ranges = <0 0 0xf 0xe8000000 0x08000000>;
+
+		nor@0,0 {
+			#address-cells = <1>;
+			#size-cells = <1>;
+			compatible = "cfi-flash";
+			reg = <0x0 0x0 0x8000000>;
+			bank-width = <2>;
+			device-width = <1>;
+
+			/* reset configuration word */
+			partition@0 {
+				label = "NOR reset configuration word";
+				reg = <0 0x20000>;
+			};
+			/* 8 MB linux kernel image */
+			partition@20000 {
+				label = "NOR Linux kernel image";
+				reg =<0x20000 0x800000>;
+			};
+			/* 64 kB flat device tree blob */
+			partition@820000 {
+				label = "NOR Linux device tree blob";
+				reg =<0x820000 0x20000>;
+			};
+			/* 64 MB root file system image */
+			partition@840000 {
+				label = "NOR Linux root file system image";
+				reg =<0x840000 0x4000000>;
+			};
+			/* 54 MB spare partition */
+			partition@4840000 {
+				label = "NOR spare partition";
+				reg =<0x4840000 0x3600000>;
+			};
+			/* 64 kB frame manager microcode +
+			 *  64 kB quicc engine microcode
+			 * common partition because sector boundary
+			 * > default offset
+			 * frame manager microcode @ 0xeff00000, size 0x10000
+			 * quicc engine microcode @ 0xeff10000, size 0x10000
+			 */
+			partition@0x7f00000 {
+				label = "NOR frame manager microcode + quicc engine microcode";
+				reg = <0x7f00000 0x20000>;
+			};
+			/* 64 kB u-boot environment variables */
+			partition@0x7f20000 {
+				label = "NOR u-boot environment variables";
+				reg = <0x7f20000 0x20000>;
+			};
+			/* 768 kB u-boot bootloader image */
+			partition@0x7f40000 {
+				label = "NOR u-boot bootloader image";
+				reg = <0x7f40000 0xc0000>;
+			};
+		};
+	};
+
+	memory {
+		device_type = "memory";
+	};
+
+	/* debug control and status register */
+	dcsr: dcsr@f00000000 {
+		ranges = <0x00000000 0xf 0x00000000 0x01072000>;
+	};
+
+	/* buffer manager (part of the data-path acceleration architecture) */
+	bportals: bman-portals@ff4000000 {
+		ranges = <0x0 0xf 0xf4000000 0x2000000>;
+	};
+
+	qportals: qman-portals@ff6000000 {
+		ranges = <0x0 0xf 0xf6000000 0x2000000>;
+	};
+
+	soc: soc@ffe000000 {
+		ranges = <0x00000000 0xf 0xfe000000 0x1000000>;
+		reg = <0xf 0xfe000000 0 0x00001000>;
+
+		/* I2C1 */
+		i2c@118000 {
+			/* System Controller */
+			/* not implemented, ad: 0x11 */
+
+			/* SE97B temp sensor */
+			temp-sensor@18 {
+				compatible = "jc42";
+				reg = <0x18>;
+			};
+			/* SA56000 temp sensor */
+			temp-sensor@4c {
+				compatible = "lm86";
+				reg = <0x4c>;
+			};
+			/* config eeprom */
+			eeprom@50 {
+				compatible = "at,24c02";
+				reg = <0x50>;
+				pagesize = <64>;
+			};
+			/* data eeprom  */
+			eeprom@57 {
+				compatible = "at,24c32";
+				reg = <0x57>;
+				pagesize = <64>;
+			};
+			/* RTC PCF85063A */
+			rtc@51 {
+				compatible = "nxp,pcf85063";
+				reg = <0x51>;
+			};
+		};
+
+		/* all of the following components are on the STK */
+		/* I2C2 */
+		i2c@118100 {
+			/* PCA9530 PWM */
+			gpio@60 {
+				compatible = "nxp,pca9530";
+				reg = <0x60>;
+			};
+			/* PCA9554 GPIO: DIP Switches */
+			gpio@20 {
+				compatible = "nxp,pca9554";
+				reg = <0x20>;
+			};
+			/* PCA9554 GPIO: PCIe & LCD control */
+			gpio@21 {
+				compatible = "nxp,pca9554";
+				reg = <0x21>;
+			};
+			/* PCA9554 GPIO: SerDes & DIU Mux, LEDs*/
+			gpio@22 {
+				compatible = "nxp,pca9554";
+				reg = <0x22>;
+			};
+			/* PCA9554 GPIO: XFI control, SGMII INT# */
+			gpio@23 {
+				compatible = "nxp,pca9554";
+				reg = <0x23>;
+			};
+			/* STMPE touchscreen controller */
+			stmpe811: stmpe811@41 {
+				compatible = "st,stmpe811";
+				reg = <0x41>;
+				wakeup-source;
+				st,autosleep-timeout = <1024>;
+				stmpe_touchscreen {
+					compatible = "st,stmpe-ts";
+					st,sample-time = <4>;
+					st,mod-12b = <1>;
+					st,ref-sel = <0>;
+					st,adc-freq = <1>;
+					st,ave-ctrl = <1>;
+					st,touch-det-delay = <2>;
+					st,settling = <2>;
+					st,fraction-z = <7>;
+					st,i-drive = <1>;
+				};
+			};
+		};
+
+		sdhc@114000 {
+			voltage-ranges = <1800 1800 3300 3300>;
+		};
+
+		fman@400000 {
+			/* MAC1: SGMII 88E11340S
+			 * STKT allows SGMII 88E11340S or QSGMII 88E11340S
+			 * only SGMII is supported by T2081
+			 */
+			ethernet@e0000 {
+				phy-handle = <&phy_sgmii_0>;
+				phy-connection-type = "sgmii";
+			};
+
+			/* MAC2: SGMII DP83867 */
+			ethernet@e2000 {
+				phy-handle = <&phy_sgmii_1>;
+				phy-connection-type = "sgmii";
+			};
+
+			/* MAC3: RGMII DP83867 (EC1) */
+			ethernet@e4000 {
+				phy-handle = <&phy_rgmii_0>;
+				phy-connection-type = "rgmii-id";
+				external-phy-connection-type = "rgmii-id";
+			};
+
+			/* MAC4: RGMII DP83867 (EC2) or SGMII DP83867
+			 * STKT allows RGMII DP83867 or SGMII DP83867
+			 * RGMII DP83867 implemented in this device tree
+			 */
+			ethernet@e6000 {
+				phy-handle = <&phy_rgmii_1>;
+				phy-connection-type = "rgmii-id";
+				external-phy-connection-type = "rgmii-id";
+			};
+
+			/* MAC5: SGMII DP83867 */
+			ethernet@e8000 {
+				phy-handle = <&phy_sgmii_2>;
+				phy-connection-type = "sgmii";
+			};
+
+			/* MAC6: ethernet@ea000 unused */
+
+			/* MAC9: XFI */
+			ethernet@f0000 {
+				/*phy-handle = none;*/
+				phy-connection-type = "xgmii";
+			};
+
+			/* MAC10: ethernet@f2000 unused */
+
+			mdio@fc000 {
+				phy_rgmii_0: ethernet-phy@0e {
+					reg = <0x0e>;
+					ti,tx-internal-delay = <DP83867_RGMIIDCTL_2_50_NS>;
+					ti,rx-internal-delay = <DP83867_RGMIIDCTL_2_00_NS>;
+					ti,fifo-depth = <DP83867_PHYCR_FIFO_DEPTH_4_B_NIB>;
+					ti,dp83867-clk-out-sel = <DP83867_IOMUXCFG_CLK_O_SEL_REF_CLK>;
+				};
+				phy_rgmii_1: ethernet-phy@05 {
+					reg = <0x05>;
+					ti,tx-internal-delay = <DP83867_RGMIIDCTL_2_50_NS>;
+					ti,rx-internal-delay = <DP83867_RGMIIDCTL_2_00_NS>;
+					ti,fifo-depth = <DP83867_PHYCR_FIFO_DEPTH_4_B_NIB>;
+					ti,dp83867-clk-out-sel = <DP83867_IOMUXCFG_CLK_O_SEL_CHA_RX>;
+				};
+				phy_sgmii_0: ethernet-phy@1D {
+					reg = <0x1D>;
+				};
+				phy_sgmii_1: ethernet-phy@03 {
+					reg = <0x03>;
+					ti,tx-internal-delay = <DP83867_RGMIIDCTL_2_50_NS>;
+					ti,rx-internal-delay = <DP83867_RGMIIDCTL_2_00_NS>;
+					ti,fifo-depth = <DP83867_PHYCR_FIFO_DEPTH_4_B_NIB>;
+					ti,dp83867-clk-out-sel = <DP83867_IOMUXCFG_CLK_O_SEL_REF_CLK>;
+				};
+				phy_sgmii_2: ethernet-phy@01 {
+					reg = <0x01>;
+					ti,tx-internal-delay = <DP83867_RGMIIDCTL_2_50_NS>;
+					ti,rx-internal-delay = <DP83867_RGMIIDCTL_2_00_NS>;
+					ti,fifo-depth = <DP83867_PHYCR_FIFO_DEPTH_4_B_NIB>;
+					ti,dp83867-clk-out-sel = <DP83867_IOMUXCFG_CLK_O_SEL_REF_CLK>;
+				};
+			};
+		};
+	};
+
+	pci0: pcie@ffe240000 {
+		status = "disabled";
+	};
+
+	pci1: pcie@ffe250000 {
+		status = "disabled";
+	};
+
+	pci2: pcie@ffe260000 {
+		status = "disabled";
+	};
+
+	pci3: pcie@ffe270000 {
+		reg = <0xf 0xfe270000 0 0x10000>;
+		ranges = <0x02000000 0 0xe0000000 0xc 0x40000000 0 0x10000000
+			  0x01000000 0 0x00000000 0xf 0xf8030000 0 0x00010000>;
+		pcie@0 {
+			ranges = <0x02000000 0 0xe0000000
+				  0x02000000 0 0xe0000000
+				  0 0x20000000
+
+				  0x01000000 0 0x00000000
+				  0x01000000 0 0x00000000
+				  0 0x00010000>;
+		};
+	};
+};
+
+/include/ "qoriq-dpaa-res3.dtsi"
+/include/ "t2081si-post.dtsi"

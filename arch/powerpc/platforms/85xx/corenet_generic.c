@@ -164,6 +164,7 @@ static const char * const boards[] __initconst = {
 	"varisys,CYRUS",
 	"tqc,TQMT1042",
 	"tqc,TQMT1040",
+	"tqc,TQMT2081",
 	NULL
 };
 
