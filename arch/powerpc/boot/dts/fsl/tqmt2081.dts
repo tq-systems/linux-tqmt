@@ -35,7 +35,6 @@
  */
 
 /include/ "t208xsi-pre.dtsi"
-/include/ "t208xrdb.dtsi"
 
 /* include ethernet phy header to set rgmii timings in device tree */
 #include <dt-bindings/net/ti-dp83867.h>
