@@ -198,25 +198,34 @@ reserved-memory {
 				compatible = "nxp,pca9530";
 				reg = <0x60>;
 			};
-			/* PCA9554 GPIO: DIP Switches */
+			/* PCA9554 GPIO (D56): Buttons, GPIO DIP Switches */
 			gpio@20 {
 				compatible = "nxp,pca9554";
 				reg = <0x20>;
 			};
-			/* PCA9554 GPIO: PCIe & LCD control */
+			/* PCA9554 GPIO (D55): PCIe & LCD control */
 			gpio@21 {
 				compatible = "nxp,pca9554";
 				reg = <0x21>;
 			};
-			/* PCA9554 GPIO: SerDes & DIU Mux, LEDs*/
+			/* PCA9554 GPIO (D58): SerDes Mux DIP Switches, LEDs*/
 			gpio@22 {
 				compatible = "nxp,pca9554";
 				reg = <0x22>;
 			};
-			/* PCA9554 GPIO: XFI control, SGMII INT# */
+			/* PCA9554 GPIO (D57): XFI control, ETH INT# */
 			gpio@23 {
 				compatible = "nxp,pca9554";
 				reg = <0x23>;
+				gpio-controller;
+				#gpio-cells = <0x2>;
+
+				xfi_tx_dis {
+					gpio-hog;
+					gpios = <1 0>;
+					output-low;
+					line-name = "xfi_tx_dis-gpio";
+				};
 			};
 			/* STMPE touchscreen controller */
 			stmpe811: stmpe811@41 {
