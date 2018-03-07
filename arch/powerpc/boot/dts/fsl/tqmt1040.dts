@@ -45,14 +45,14 @@
 	interrupt-parent = <&mpic>;
 	#address-cells = <2>;
 	#size-cells = <2>;
-		
+
  	aliases {
 		phy_rgmii_0 = &phy_rgmii_0;
 		phy_rgmii_1 = &phy_rgmii_1;
 		phy_sgmii_1 = &phy_sgmii_1;
 		phy_sgmii_3 = &phy_sgmii_3;
 	};
-	
+
 	reserved-memory {
 		#address-cells = <2>;
 		#size-cells = <2>;
@@ -71,7 +71,7 @@
 			alignment = <0 0x2000000>;
 		};
 	};
-	
+
 	ifc: localbus@ffe124000 {
 		reg = <0xf 0xfe124000 0 0x2000>;
 		ranges = <0 0 0xf 0xe8000000 0x08000000>;
@@ -83,7 +83,7 @@
 			reg = <0x0 0x0 0x8000000>;
 			bank-width = <2>;
 			device-width = <1>;
-			
+
 			/* reset configuration word */
 			partition@0 {
 				label = "NOR reset configuration word";
@@ -109,10 +109,13 @@
 				label = "NOR spare partition";
 				reg =<0x4840000 0x3600000>;
 			};
-			/* 64 kB frame manager microcode + 64 kB quicc engine microcode
-			 * common partition because sector boundary > default offset
+			/* 64 kB frame manager microcode +
+			 *  64 kB quicc engine microcode
+			 * common partition because sector boundary
+			 * > default offset
 			 * frame manager microcode @ 0xeff00000, size 0x10000
-			 * quicc engine microcode @ 0xeff10000, size 0x10000 */
+			 * quicc engine microcode @ 0xeff10000, size 0x10000
+			 */
 			partition@0x7f00000 {
 				label = "NOR frame manager microcode + quicc engine microcode";
 				reg = <0x7f00000 0x20000>;
@@ -121,44 +124,44 @@
 			partition@0x7f20000 {
 				label = "NOR u-boot environment variables";
 				reg = <0x7f20000 0x20000>;
-			};					
+			};
 			/* 768 kB u-boot bootloader image */
 			partition@0x7f40000 {
 				label = "NOR u-boot bootloader image";
 				reg = <0x7f40000 0xc0000>;
-			};						
+			};
 		};
 	};
 
 	memory {
 		device_type = "memory";
 	};
-	
+
 	/* debug control and status register */
 	dcsr: dcsr@f00000000 {
 		ranges = <0x00000000 0xf 0x00000000 0x01072000>;
 	};
-	
-	/* buffer manager (part of the data-path acceleration architecture) */ 
+
+	/* buffer manager (part of the data-path acceleration architecture) */
 	bportals: bman-portals@ff4000000 {
 		ranges = <0x0 0xf 0xf4000000 0x2000000>;
 	};
-	
+
 	qportals: qman-portals@ff6000000 {
 		ranges = <0x0 0xf 0xf6000000 0x2000000>;
 	};
-	
+
 	soc: soc@ffe000000 {
 		ranges = <0x00000000 0xf 0xfe000000 0x1000000>;
 		reg = <0xf 0xfe000000 0 0x00001000>;
-		
-		/* I2C1 */ 
+
+		/* I2C1 */
 		 i2c@118000 {
 			/* SE97B temp sensor */
 			temp-sensor@18 {
 				compatible = "jc42";
 				reg = <0x18>;
-			};	 
+			};
 			/* SA56000 temp sensor */
 			temp-sensor@4c {
 				compatible = "lm86";
@@ -182,7 +185,7 @@
 				reg = <0x51>;
 			};
 		};
-		
+
 		/* all of the following components are on the STK */
 		/* I2C2 */
 		i2c@118100 {
@@ -190,33 +193,33 @@
 			gpio@60 {
 				compatible = "nxp,pca9530";
 				reg = <0x60>;
-			};		
+			};
 			/* PCA9554 GPIO: DIP Switches */
 			gpio@20 {
 				compatible = "nxp,pca9554";
 				reg = <0x20>;
-			};				
+			};
 			/* PCA9554 GPIO: PCIe & LCD control */
 			gpio@21 {
 				compatible = "nxp,pca9554";
 				reg = <0x21>;
-			};	
+			};
 			/* PCA9554 GPIO: SerDes & DIU Mux, LEDs*/
 			gpio@22 {
 				compatible = "nxp,pca9554";
 				reg = <0x22>;
-			};	
+			};
 			/* PCA9554 GPIO: XFI control, SGMII INT# */
 			gpio@23 {
 				compatible = "nxp,pca9554";
 				reg = <0x23>;
-			};				
+			};
 			/* STMPE touchscreen controller */
 			stmpe811: stmpe811@41 {
 				compatible = "st,stmpe811";
 				reg = <0x41>;
 				wakeup-source;
-				st,autosleep-timeout = <1024>;			
+				st,autosleep-timeout = <1024>;
 				stmpe_touchscreen {
 					compatible = "st,stmpe-ts";
 					st,sample-time = <4>;
@@ -228,13 +231,13 @@
 					st,settling = <2>;
 					st,fraction-z = <7>;
 					st,i-drive = <1>;
-				};						
-			};					
+				};
+			};
 		};
-		 
+
 		fman0: fman@400000 {
 			sleep = <&rcpm 0x00000008>;
-			
+
 			/* MAC1: QSGMII 88E11340S
 			 * STKT allows SGMII 88E11340S or QSGMII 88E11340S
 			 */
@@ -242,19 +245,19 @@
 				fixed-link = <0 1 1000 0 0>;
 				phy-connection-type = "sgmii";
 			};
-			
+
 			/* MAC2: SGMII DP83867 */
 			enet1: ethernet@e2000 {
 				phy-handle = <&phy_sgmii_1>;
 				phy-connection-type = "sgmii";
 			};
-			
+
 			/* MAC3: SGMII 88E11340S */
 			enet2: ethernet@e4000 {
 				fixed-link = <1 1 1000 0 0>;
 				phy-connection-type = "sgmii";
 			};
-			
+
 			/* MAC4: RGMII DP83867 or SGMII DP83867
 			 * STKT allows RGMII DP83867 or SGMII DP83867
 			 * RGMII DP83867 implemented in this device tree
@@ -264,14 +267,14 @@
 				phy-connection-type = "rgmii-id";
 				external-phy-connection-type = "rgmii-id";
 			};
-			
+
 			/* MAC5: RGMII DP83867 */
 			enet4: ethernet@e8000 {
 				phy-handle = <&phy_rgmii_1>;
 				phy-connection-type = "rgmii-id";
 				external-phy-connection-type = "rgmii-id";
 			};
-			
+
 			/* external, dedicated MDIO */
 			mdio0: mdio@fc000 {
 				phy_rgmii_0: ethernet-phy@0e {
@@ -340,7 +343,7 @@
                         };
 		};
 	};
-	
+
 	pci0: pcie@ffe240000 {
 		status = "disabled";
 	};
@@ -389,7 +392,7 @@
 				  0 0x00010000>;
 		};
 	};
-	        
+
 	/* bp dts definition is borrowed from other USDPAA dts */
 	bp6: buffer-pool@6 {
 		compatible = "fsl,t1040-bpool", "fsl,bpool";
@@ -397,8 +400,8 @@
 		fsl,bpool-ethernet-cfg = <0 0 0 1728 0 0xfeedabba>;
 		fsl,bpool-thresholds = <0x100 0x300 0x0 0x0>;
 	};
-	
+
 };
 
-#include "t1040si-post.dtsi" 
+#include "t1040si-post.dtsi"
 #include "qoriq-dpaa-res3.dtsi"
