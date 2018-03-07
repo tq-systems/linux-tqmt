@@ -295,8 +295,18 @@ reserved-memory {
 
 			/* MAC9: XFI */
 			ethernet@f0000 {
-				/*phy-handle = none;*/
 				phy-connection-type = "xgmii";
+				fixed-link {
+					/* Workaround:
+					 * Set speed to 1000 here as the
+					 * fixed_phy device does accept higher
+					 * speeds. This workaround does not
+					 * affect the bandwidth though, it
+					 * remains at full 10G.
+					 */
+					speed = <1000>;
+					full-duplex;
+				};
 			};
 
 			/* MAC10: ethernet@f2000 unused */
