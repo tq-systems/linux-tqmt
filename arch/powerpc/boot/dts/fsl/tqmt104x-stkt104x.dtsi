@@ -1,0 +1,137 @@
+/*
+ * TQMT104x STKT14x Device Tree Source
+ *
+ * Copyright 2014 Freescale Semiconductor Inc.
+ * Copyright 2016 Stefan Lange <s.lange@gateware.de>
+ * Copyright 2019 Max Merchel <Max.Merchel@tq-group.com>
+ * 
+ * Redistribution and use in source and binary forms, with or without
+ * modification, are permitted provided that the following conditions are met:
+ *     * Redistributions of source code must retain the above copyright
+ *	 notice, this list of conditions and the following disclaimer.
+ *     * Redistributions in binary form must reproduce the above copyright
+ *	 notice, this list of conditions and the following disclaimer in the
+ *	 documentation and/or other materials provided with the distribution.
+ *     * Neither the name of Freescale Semiconductor nor the
+ *	 names of its contributors may be used to endorse or promote products
+ *	 derived from this software without specific prior written permission.
+ *
+ *
+ * ALTERNATIVELY, this software may be distributed under the terms of the
+ * GNU General Public License ("GPL") as published by the Free Software
+ * Foundation, either version 2 of that License or (at your option) any
+ * later version.
+ *
+ * THIS SOFTWARE IS PROVIDED BY Freescale Semiconductor "AS IS" AND ANY
+ * EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE IMPLIED
+ * WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE ARE
+ * DISCLAIMED. IN NO EVENT SHALL Freescale Semiconductor BE LIABLE FOR ANY
+ * DIRECT, INDIRECT, INCIDENTAL, SPECIAL, EXEMPLARY, OR CONSEQUENTIAL DAMAGES
+ * (INCLUDING, BUT NOT LIMITED TO, PROCUREMENT OF SUBSTITUTE GOODS OR SERVICES;
+ * LOSS OF USE, DATA, OR PROFITS; OR BUSINESS INTERRUPTION) HOWEVER CAUSED AND
+ * ON ANY THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT
+ * (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS
+ * SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
+ */
+
+/* all of the following components are on the STK */
+/ {
+	soc: soc@ffe000000 {
+		/* I2C2 */
+		i2c@118100 {
+			/* PCA9530 PWM */
+			gpio@60 {
+				compatible = "nxp,pca9530";
+				reg = <0x60>;
+			};
+			/* PCA9554 GPIO: DIP Switches */
+			gpio@20 {
+				compatible = "nxp,pca9554";
+				reg = <0x20>;
+			};
+			/* PCA9554 GPIO: PCIe & LCD control */
+			gpio@21 {
+				compatible = "nxp,pca9554";
+				reg = <0x21>;
+			};
+			/* PCA9554 GPIO: SerDes & DIU Mux, LEDs*/
+			gpio@22 {
+				compatible = "nxp,pca9554";
+				reg = <0x22>;
+			};
+			/* PCA9554 GPIO: XFI control, SGMII INT# */
+			gpio@23 {
+				compatible = "nxp,pca9554";
+				reg = <0x23>;
+			};
+			/* STMPE touchscreen controller */
+			stmpe811: stmpe811@41 {
+				compatible = "st,stmpe811";
+				reg = <0x41>;
+				wakeup-source;
+				st,autosleep-timeout = <1024>;
+				stmpe_touchscreen {
+					compatible = "st,stmpe-ts";
+					st,sample-time = <4>;
+					st,mod-12b = <1>;
+					st,ref-sel = <0>;
+					st,adc-freq = <1>;
+					st,ave-ctrl = <1>;
+					st,touch-det-delay = <2>;
+					st,settling = <2>;
+					st,fraction-z = <7>;
+					st,i-drive = <1>;
+				};
+			};
+		};
+	};
+
+	pci0: pcie@ffe240000 {
+		status = "disabled";
+	};
+
+	pci1: pcie@ffe250000 {
+		reg = <0xf 0xfe250000 0 0x10000>;
+		ranges = <0x02000000 0x0 0xe0000000 0xc 0x10000000 0x0 0x10000000
+			  0x01000000 0x0 0x00000000 0xf 0xf8010000 0x0 0x00010000>;
+		pcie@0 {
+			ranges = <0x02000000 0 0xe0000000
+				  0x02000000 0 0xe0000000
+				  0 0x10000000
+
+				  0x01000000 0 0x00000000
+				  0x01000000 0 0x00000000
+				  0 0x00010000>;
+		};
+	};
+
+	pci2: pcie@ffe260000 {
+		reg = <0xf 0xfe260000 0 0x10000>;
+		ranges = <0x02000000 0 0xe0000000 0xc 0x20000000 0 0x10000000
+			  0x01000000 0 0x00000000 0xf 0xf8020000 0 0x00010000>;
+		pcie@0 {
+			ranges = <0x02000000 0 0xe0000000
+				  0x02000000 0 0xe0000000
+				  0 0x10000000
+
+				  0x01000000 0 0x00000000
+				  0x01000000 0 0x00000000
+				  0 0x00010000>;
+		};
+	};
+
+	pci3: pcie@ffe270000 {
+		reg = <0xf 0xfe270000 0 0x10000>;
+		ranges = <0x02000000 0 0xe0000000 0xc 0x30000000 0 0x10000000
+			  0x01000000 0 0x00000000 0xf 0xf8030000 0 0x00010000>;
+		pcie@0 {
+			ranges = <0x02000000 0 0xe0000000
+				  0x02000000 0 0xe0000000
+				  0 0x10000000
+
+				  0x01000000 0 0x00000000
+				  0x01000000 0 0x00000000
+				  0 0x00010000>;
+		};
+	};
+};

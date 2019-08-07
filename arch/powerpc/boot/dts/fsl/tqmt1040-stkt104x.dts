@@ -1,0 +1,112 @@
+/*
+ * TQMT1040 Device Tree Source
+ * including starterkit STKTxxxx
+ *
+ * Copyright 2014 Freescale Semiconductor Inc.
+ * Copyright 2016 Stefan Lange <s.lange@gateware.de>
+ * Copyright 2019 Max Merchel <Max.Merchel@tq-group.com>
+ *
+ * Redistribution and use in source and binary forms, with or without
+ * modification, are permitted provided that the following conditions are met:
+ *     * Redistributions of source code must retain the above copyright
+ *	 notice, this list of conditions and the following disclaimer.
+ *     * Redistributions in binary form must reproduce the above copyright
+ *	 notice, this list of conditions and the following disclaimer in the
+ *	 documentation and/or other materials provided with the distribution.
+ *     * Neither the name of Freescale Semiconductor nor the
+ *	 names of its contributors may be used to endorse or promote products
+ *	 derived from this software without specific prior written permission.
+ *
+ *
+ * ALTERNATIVELY, this software may be distributed under the terms of the
+ * GNU General Public License ("GPL") as published by the Free Software
+ * Foundation, either version 2 of that License or (at your option) any
+ * later version.
+ *
+ * THIS SOFTWARE IS PROVIDED BY Freescale Semiconductor "AS IS" AND ANY
+ * EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE IMPLIED
+ * WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE ARE
+ * DISCLAIMED. IN NO EVENT SHALL Freescale Semiconductor BE LIABLE FOR ANY
+ * DIRECT, INDIRECT, INCIDENTAL, SPECIAL, EXEMPLARY, OR CONSEQUENTIAL DAMAGES
+ * (INCLUDING, BUT NOT LIMITED TO, PROCUREMENT OF SUBSTITUTE GOODS OR SERVICES;
+ * LOSS OF USE, DATA, OR PROFITS; OR BUSINESS INTERRUPTION) HOWEVER CAUSED AND
+ * ON ANY THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT
+ * (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS
+ * SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
+ */
+
+/* include CPU */
+#include "t104xsi-pre.dtsi"
+/* include ethernet phy header to set rgmii timings in device tree */
+#include <dt-bindings/net/ti-dp83867.h>
+
+/*include stkt104x*/
+#include "tqmt104x-stkt104x.dtsi"
+/*include tqmt104x*/
+#include "tqmt104x.dtsi"
+
+/ {
+	model = "TQ TQMT1040 on STKT104x";
+	compatible = "tq,stkt104x", "tq,tqmt1040";
+};
+
+
+/* MAC1: QSGMII 88E11340S
+ * STKT allows SGMII 88E11340S or QSGMII 88E11340S
+ */
+&enet0: ethernet@e0000 {
+	fixed-link = <0 1 1000 0 0>;
+};
+
+/* MAC3: SGMII 88E11340S */
+&enet2: ethernet@e4000 {
+	fixed-link = <1 1 1000 0 0>;
+};
+
+&mdio0 {
+	phy_sgmii_0 {
+		status = "disabled";
+	};
+	phy_sgmii_2 {
+		status = "disabled";
+	};
+	phy_qsgmii_0: ethernet-phy@1C {
+		reg = <0x1C>;
+		interrupts = <0 1 0 0>;
+	};
+	phy_qsgmii_1: ethernet-phy@1D {
+		reg = <0x1D>;
+		interrupts = <0 1 0 0>;
+	};
+	phy_qsgmii_2: ethernet-phy@1E {
+		reg = <0x1E>;
+		interrupts = <0 1 0 0>;
+	};
+	phy_qsgmii_3: ethernet-phy@1F {
+		reg = <0x1F>;
+		interrupts = <0 1 0 0>;
+	};
+};
+
+&soc: {
+	l2switch@800000 {
+		port@100000 {
+			phy-connection-type = "qsgmii";
+			phy-handle = <&phy_qsgmii_0>;
+		};
+		port@110000 {
+			phy-connection-type = "qsgmii";
+			phy-handle = <&phy_qsgmii_1>;
+		};
+		port@120000 {
+			phy-connection-type = "qsgmii";
+			phy-handle = <&phy_qsgmii_2>;
+		};
+		port@130000 {
+			phy-connection-type = "qsgmii";
+			phy-handle = <&phy_qsgmii_3>;
+		};
+	};
+};
+
+#include "t1040si-post.dtsi"
