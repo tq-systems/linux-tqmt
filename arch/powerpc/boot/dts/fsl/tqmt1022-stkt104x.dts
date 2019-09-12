@@ -49,3 +49,8 @@
 };
 
 #include "t1042si-post.dtsi"
+
+/delete-node/ dcsr-cpu-sb-proxy@110000;
+/delete-node/ dcsr-cpu-sb-proxy@118000;
+/delete-node/ map2;
+/delete-node/ map3;
