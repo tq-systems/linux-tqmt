@@ -54,12 +54,12 @@
 /* MAC1: QSGMII 88E11340S
  * STKT allows SGMII 88E11340S or QSGMII 88E11340S
  */
-&enet0: ethernet@e0000 {
+&enet0 {
 	fixed-link = <0 1 1000 0 0>;
 };
 
 /* MAC3: SGMII 88E11340S */
-&enet2: ethernet@e4000 {
+&enet2 {
 	fixed-link = <1 1 1000 0 0>;
 };
 
@@ -88,7 +88,7 @@
 	};
 };
 
-&soc: {
+&soc {
 	l2switch@800000 {
 		port@100000 {
 			phy-connection-type = "qsgmii";
