@@ -46,6 +46,12 @@
 / {
 	model = "TQ TQMT1042 on STKT104x";
 	compatible = "tq,stkt104x", "tq,tqmt1042";
+
+	ifc: localbus@ffe124000 {
+		cpld@3,0 {
+			compatible = "fsl,t1042rdb-cpld";
+		};
+	};
 };
 
 #include "t1042si-post.dtsi"
