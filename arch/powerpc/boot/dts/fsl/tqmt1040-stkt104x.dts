@@ -51,7 +51,7 @@
 
 	ifc: localbus@ffe124000 {
 		cpld@3,0 {
-			compatible = "fsl,t1040rdb-cpld";
+			compatible = "fsl,t1042rdb-cpld";
 		};
 	};
 };
