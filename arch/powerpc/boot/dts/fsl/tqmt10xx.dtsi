@@ -1,0 +1,274 @@
+// SPDX-License-Identifier: (GPL-2.0-or-later)
+/*
+ * TQMT1042 Device Tree Source
+ * including starterkit STKTxxxx
+ *
+ * Copyright 2014 Freescale Semiconductor Inc.
+ * Copyright 2016 Stefan Lange <s.lange@gateware.de>
+ * Copyright 2019 Max Merchel <Max.Merchel@tq-group.com>
+ */
+
+/ {
+	interrupt-parent = <&mpic>;
+	#address-cells = <2>;
+	#size-cells = <2>;
+
+	reserved-memory {
+		#address-cells = <2>;
+		#size-cells = <2>;
+		ranges;
+
+		bman_fbpr: bman-fbpr {
+			size = <0 0x1000000>;
+			alignment = <0 0x1000000>;
+		};
+		qman_fqd: qman-fqd {
+			size = <0 0x400000>;
+			alignment = <0 0x400000>;
+		};
+		qman_pfdr: qman-pfdr {
+			size = <0 0x2000000>;
+			alignment = <0 0x2000000>;
+		};
+	};
+
+	ifc: localbus@ffe124000 {
+		reg = <0xf 0xfe124000 0 0x2000>;
+		ranges = <0 0 0xf 0xe8000000 0x08000000>;
+
+		nor@0,0 {
+			#address-cells = <1>;
+			#size-cells = <1>;
+			compatible = "cfi-flash";
+			reg = <0x0 0x0 0x8000000>;
+			bank-width = <2>;
+			device-width = <1>;
+
+			/* reset configuration word */
+			partition@0 {
+				label = "NOR reset configuration word";
+				reg = <0 0x20000>;
+			};
+			/* 8 MB linux kernel image */
+			partition@20000 {
+				label = "NOR Linux kernel image";
+				reg =<0x20000 0x800000>;
+			};
+			/* 64 kB flat device tree blob */
+			partition@820000 {
+				label = "NOR Linux device tree blob";
+				reg =<0x820000 0x20000>;
+			};
+			/* 64 MB root file system image */
+			partition@840000 {
+				label = "NOR Linux root file system image";
+				reg =<0x840000 0x4000000>;
+			};
+			/* 54 MB spare partition */
+			partition@4840000 {
+				label = "NOR spare partition";
+				reg =<0x4840000 0x3600000>;
+			};
+			/* 64 kB frame manager microcode +
+			 *  64 kB quicc engine microcode
+			 * common partition because sector boundary
+			 * > default offset
+			 * frame manager microcode @ 0xeff00000, size 0x10000
+			 * quicc engine microcode @ 0xeff10000, size 0x10000
+			 */
+			partition@0x7f00000 {
+				label = "NOR frame manager microcode + quicc engine microcode";
+				reg = <0x7f00000 0x20000>;
+			};
+			/* 64 kB u-boot environment variables */
+			partition@0x7f20000 {
+				label = "NOR u-boot environment variables";
+				reg = <0x7f20000 0x20000>;
+			};
+			/* 768 kB u-boot bootloader image */
+			partition@0x7f40000 {
+				label = "NOR u-boot bootloader image";
+				reg = <0x7f40000 0xc0000>;
+			};
+		};
+	};
+
+	memory {
+		device_type = "memory";
+	};
+
+	/* debug control and status register */
+	dcsr: dcsr@f00000000 {
+		ranges = <0x00000000 0xf 0x00000000 0x01072000>;
+	};
+
+	/* buffer manager (part of the data-path acceleration architecture) */
+	bportals: bman-portals@ff4000000 {
+		ranges = <0x0 0xf 0xf4000000 0x2000000>;
+	};
+
+	qportals: qman-portals@ff6000000 {
+		ranges = <0x0 0xf 0xf6000000 0x2000000>;
+	};
+
+	soc: soc@ffe000000 {
+		ranges = <0x00000000 0xf 0xfe000000 0x1000000>;
+		reg = <0xf 0xfe000000 0 0x00001000>;
+
+		/* I2C1 */
+		 i2c@118000 {
+			/* SE97B temp sensor */
+			temp-sensor@18 {
+				compatible = "jedec,jc-42.4-temp";
+				reg = <0x18>;
+			};
+			/* SA56000 temp sensor */
+			temp-sensor@4c {
+				compatible = "lm86";
+				reg = <0x4c>;
+			};
+			/* config eeprom */
+			eeprom@50 {
+				compatible = "nxp,se97b", "atmel,24c02";
+				reg = <0x50>;
+				pagesize = <16>;
+				read-only;
+			};
+			/* data eeprom  */
+			eeprom@57 {
+				compatible = "atmel,24c256";
+				reg = <0x57>;
+				pagesize = <64>;
+			};
+			/* RTC PCF85063A */
+			rtc@51 {
+				compatible = "nxp,pcf85063";
+				reg = <0x51>;
+			};
+		};
+
+		fman0: fman@400000 {
+			sleep = <&rcpm 0x00000008>;
+
+			enet0: ethernet@e0000 {
+			};
+
+			enet1: ethernet@e2000 {
+			};
+
+			enet2: ethernet@e4000 {
+			};
+
+			enet3: ethernet@e6000 {
+			};
+
+			enet4: ethernet@e8000 {
+			};
+
+			mdio0: mdio@fc000 {
+			};
+		};
+	};
+
+	pci0: pcie@ffe240000 {
+		status = "disabled";
+		reg = <0xf 0xfe240000 0 0x10000>;
+		ranges = <0x02000000 0 0xe0000000 0xc 0x0 0x0 0x10000000
+			  0x01000000 0 0x0 0xf 0xf8000000 0x0 0x00010000>;
+		pcie@0 {
+			ranges = <0x02000000 0 0xe0000000
+				  0x02000000 0 0xe0000000
+				  0 0x10000000
+
+				  0x01000000 0 0x00000000
+				  0x01000000 0 0x00000000
+				  0 0x00010000>;
+		};
+	};
+
+	pci1: pcie@ffe250000 {
+		status = "disabled";
+		reg = <0xf 0xfe250000 0 0x10000>;
+		ranges = <0x02000000 0x0 0xe0000000 0xc 0x10000000 0x0 0x10000000
+			  0x01000000 0x0 0x00000000 0xf 0xf8010000 0x0 0x00010000>;
+		pcie@0 {
+			ranges = <0x02000000 0 0xe0000000
+				  0x02000000 0 0xe0000000
+				  0 0x10000000
+
+				  0x01000000 0 0x00000000
+				  0x01000000 0 0x00000000
+				  0 0x00010000>;
+		};
+	};
+
+	pci2: pcie@ffe260000 {
+		status = "disabled";
+		reg = <0xf 0xfe260000 0 0x10000>;
+		ranges = <0x02000000 0 0xe0000000 0xc 0x20000000 0 0x10000000
+			  0x01000000 0 0x00000000 0xf 0xf8020000 0 0x00010000>;
+		pcie@0 {
+			ranges = <0x02000000 0 0xe0000000
+				  0x02000000 0 0xe0000000
+				  0 0x10000000
+
+				  0x01000000 0 0x00000000
+				  0x01000000 0 0x00000000
+				  0 0x00010000>;
+		};
+	};
+
+	pci3: pcie@ffe270000 {
+		status = "disabled";
+		reg = <0xf 0xfe270000 0 0x10000>;
+		ranges = <0x02000000 0 0xe0000000 0xc 0x30000000 0 0x10000000
+			  0x01000000 0 0x00000000 0xf 0xf8030000 0 0x00010000>;
+		pcie@0 {
+			ranges = <0x02000000 0 0xe0000000
+				  0x02000000 0 0xe0000000
+				  0 0x10000000
+
+				  0x01000000 0 0x00000000
+				  0x01000000 0 0x00000000
+				  0 0x00010000>;
+		};
+	};
+
+	qe: qe@ffe140000 {
+		ranges = <0x0 0xf 0xfe140000 0x40000>;
+		reg = <0xf 0xfe140000 0 0x480>;
+		brg-frequency = <0>;
+		bus-frequency = <0>;
+
+		si1: si@700 {
+			compatible = "fsl,t1040-qe-si";
+			reg = <0x700 0x80>;
+		};
+
+		siram1: siram@1000 {
+			compatible = "fsl,t1040-qe-siram";
+			reg = <0x1000 0x800>;
+		};
+
+		ucc_hdlc: ucc@2000 {
+			compatible = "fsl,ucc-hdlc";
+			rx-clock-name = "clk8";
+			tx-clock-name = "clk9";
+			fsl,rx-sync-clock = "rsync_pin";
+			fsl,tx-sync-clock = "tsync_pin";
+			fsl,tx-timeslot-mask = <0xfffffffe>;
+			fsl,rx-timeslot-mask = <0xfffffffe>;
+			fsl,tdm-framer-type = "e1";
+			fsl,tdm-id = <0>;
+			fsl,siram-entry-id = <0>;
+			fsl,tdm-interface;
+		};
+
+		ucc_serial: ucc@2200 {
+			compatible = "fsl,t1040-ucc-uart";
+			port-number = <0>;
+			rx-clock-name = "brg2";
+			tx-clock-name = "brg2";
+		};
+	};
+};
