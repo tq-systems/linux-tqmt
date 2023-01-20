@@ -99,6 +99,15 @@ static const struct of_device_id of_device_ids[] = {
 	{
 		.name		= "handles",
 	},
+	{
+		.compatible	= "gpio-keys-polled",
+	},
+	{
+		.compatible	= "gpio-keys",
+	},
+	{
+		.compatible	= "gpio-leds",
+	},
 	{}
 };
 
