@@ -1,0 +1,75 @@
+// SPDX-License-Identifier: GPL-2.0-or-later
+/*
+ * TQMT1022 on STKT104x with serdes configuration 0x86 Device Tree Source
+ *
+ * Copyright (c) 2016-2023 TQ-Systems GmbH <license@tq-group.com>, D-82229 Seefeld, Germany.
+ * Copyright 2014 Freescale Semiconductor Inc.
+ * Author: Stefan Lange, Max Merchel, Gregor Herburger
+ *
+ */
+
+#include "t104xsi-pre.dtsi"
+
+#include "tqmt10xx.dtsi"
+
+/ {
+	model = "TQ TQMT1022 on STKT104x";
+	compatible = "tq,stkt104x", "tq,tqmt1022";
+
+	cpus {
+		/delete-node/ cpu2;
+		/delete-node/ cpu3;
+	};
+};
+
+#include "t1042si-post.dtsi"
+#include "stkt104x.dtsi"
+
+&dcsr {
+	/delete-node/ dcsr-cpu-sb-proxy@110000;
+	/delete-node/ dcsr-cpu-sb-proxy@118000;
+};
+
+&cpu_thermal {
+	cooling-maps {
+		/delete-node/ map2;
+		/delete-node/ map3;
+	};
+};
+
+&enet0 {
+	phy-handle = <&phy_sgmii_0>;
+	phy-connection-type = "sgmii";
+};
+
+&enet1 {
+	phy-handle = <&phy_sgmii_1>;
+	phy-connection-type = "sgmii";
+};
+
+&enet2 {
+	phy-handle = <&phy_sgmii_2>;
+	phy-connection-type = "sgmii";
+};
+
+&enet3 {
+	phy-handle = <&phy_rgmii_0>;
+	phy-connection-type = "rgmii-id";
+};
+
+&enet4 {
+	phy-handle = <&phy_rgmii_1>;
+	phy-connection-type = "rgmii-id";
+};
+
+&pci1 {
+	status = "okay";
+};
+
+&pci2 {
+	status = "okay";
+};
+
+&pci3 {
+	status = "okay";
+};

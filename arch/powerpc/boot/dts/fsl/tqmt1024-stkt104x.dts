@@ -1,0 +1,60 @@
+// SPDX-License-Identifier: GPL-2.0-or-later
+/*
+ * TQMT1024 on STKT104x with serdes configuration 0x6b Device Tree Source
+ *
+ * Copyright (c) 2016-2023 TQ-Systems GmbH <license@tq-group.com>, D-82229 Seefeld, Germany.
+ * Copyright 2014 Freescale Semiconductor Inc.
+ * Author: Stefan Lange, Max Merchel, Gregor Herburger
+ *
+ */
+
+/dts-v1/;
+
+#include "t102xsi-pre.dtsi"
+
+#include "tqmt10xx.dtsi"
+#include "stkt104x.dtsi"
+
+/ {
+	model = "TQ TQMT1024 on STKT104x";
+	compatible = "tq,tqmt1024-stkt104x", "tq,tqmt1024";
+
+};
+
+#include "t1024si-post.dtsi"
+
+&enet0 {
+	status = "disabled";
+};
+
+&enet1 {
+	phy-handle = <&phy_sgmii_3>;
+	phy-connection-type = "sgmii";
+};
+
+&enet2 {
+	status = "disabled";
+};
+
+&enet3 {
+	phy-handle = <&phy_rgmii_0>;
+	phy-connection-type = "rgmii-id";
+};
+
+&pci0 {
+	status = "okay";
+};
+
+&touch_gpio {
+	status = "disabled";
+};
+
+&gpio_exp_3 {
+	interrupts = <4 3 0 0>;
+};
+
+&gpio_exp_1 {
+	/delete-property/ interrupt-parent;
+	/delete-property/ interrupts;
+	/delete-property/ interrupt-controller;
+};

@@ -99,6 +99,15 @@ static const struct of_device_id of_device_ids[] = {
 	{
 		.name		= "handles",
 	},
+	{
+		.compatible	= "gpio-keys-polled",
+	},
+	{
+		.compatible	= "gpio-keys",
+	},
+	{
+		.compatible	= "gpio-leds",
+	},
 	{}
 };
 
@@ -135,6 +144,10 @@ static const char * const boards[] __initconst = {
 	"fsl,T1042RDB_PI",
 	"keymile,kmcent2",
 	"keymile,kmcoge4",
+	"tq,tqmt1022",
+	"tq,tqmt1024",
+	"tq,tqmt1040",
+	"tq,tqmt1042",
 	"varisys,CYRUS",
 	NULL
 };

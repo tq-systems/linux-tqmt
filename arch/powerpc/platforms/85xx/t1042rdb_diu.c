@@ -137,10 +137,9 @@ t1042rdb_valid_monitor_port(enum fsl_diu_monitor_port port)
 static int __init t1042rdb_diu_init(void)
 {
 	cpld_node = of_find_compatible_node(NULL, NULL, "fsl,t1042rdb-cpld");
-	if (!cpld_node)
-		return 0;
+	if (cpld_node)
+		diu_ops.set_monitor_port = t1042rdb_set_monitor_port;
 
-	diu_ops.set_monitor_port	= t1042rdb_set_monitor_port;
 	diu_ops.set_pixel_clock		= t1042rdb_set_pixel_clock;
 	diu_ops.valid_monitor_port	= t1042rdb_valid_monitor_port;
 
