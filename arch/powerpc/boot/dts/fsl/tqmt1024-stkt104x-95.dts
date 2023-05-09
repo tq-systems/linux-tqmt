@@ -1,8 +1,8 @@
 // SPDX-License-Identifier: GPL-2.0-or-later
 /*
- * TQMT1024 on STKT104x with serdes configuration 0x6b Device Tree Source
+ * TQMT1024 on STKT104x with serdes configuration 0x95 Device Tree Source
  *
- * Copyright (c) 2016-2023 TQ-Systems GmbH <license@tq-group.com>, D-82229 Seefeld, Germany.
+ * Copyright (c) 2016-2023 TQ-Systems GmbH <linux@ew.tq-group.com>, D-82229 Seefeld, Germany.
  * Copyright 2014 Freescale Semiconductor Inc.
  * Author: Stefan Lange, Max Merchel, Gregor Herburger
  *
@@ -18,13 +18,17 @@
 / {
 	model = "TQ TQMT1024 on STKT104x";
 	compatible = "tq,tqmt1024-stkt104x", "tq,tqmt1024";
-
 };
 
 #include "t1024si-post.dtsi"
 
 &enet0 {
-	status = "disabled";
+	status = "okay";
+	phy-connection-type = "10gbase-r";
+	fixed-link {
+		speed = <1000>;
+		full-duplex;
+	};
 };
 
 &enet1 {
